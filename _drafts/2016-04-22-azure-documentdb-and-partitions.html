@@ -1,0 +1,12 @@
+---
+layout: post
+title: Azure DocumentDb and partitions
+date: '2016-04-22T20:09:00.002+01:00'
+author: Frans Lytzen
+tags: 
+modified_time: '2016-04-22T20:09:40.024+01:00'
+blogger_id: tag:blogger.com,1999:blog-8302357413081836531.post-2750533830301540085
+blogger_orig_url: http://blog.lytzen.name/2016/04/azure-documentdb-and-partitions.html
+---
+
+Azure DocumentDb is interesting in how it deals with scaling and performance, in particular if you come from<br /><h2><br /></h2><h2>Partitioned Collection</h2><div><br /></div><h3>Testing with a partitioned collection</h3><h2>Using collections</h2><div><br /></div><h2>Self-links, UriFactory, IPartitionResolver and other oddities</h2><div><br /></div><div><h2>Why even bother with DocumentDb</h2>Lots of people have different opinions on DocumentDb as a database. I thought I'd close out by just sharing my thoughts.<br />Azure DocumentDb is an interesting technology and one we use for a number of projects. You can argue a lot about its merits vs a range of other databases, but for me it's quite simple;&nbsp;<a href="http://www.neworbit.co.uk/">We</a>&nbsp;develop software, we don't run infrastructure. I have over 200 servers and more than 300 databases of different kinds on Azure, yet I don't have any permanent sysadmins in my company and I like to keep it that way. Azure DocumentDb is provided by Azure out of the box, meaning I don't have to worry about setting up and managing my own infrastructure. More importantly; Almost all of our software is developed for other clients who have already accepted that we host on Azure. If I introduce another provider of a hosted database into the mix then I have to go through all the security audits etc with them as well and - with the kind of clients I deal with, it's simply not worth the pain. So, for me, despite being young, Azure DocumentDb is worth the pain. Your situation may be different.<br />I do liken DocumentDb to to SQL Azure four years ago; When we first started using SQL Azure it, too, was quite immature (and cheap); Performance was variable, it had no real means of monitoring and support and support for pretty much any security feature was absent. Today SQL Azure has been completely re-engineered, is rock-solid, has amazing built-in monitoring tools and ticks pretty much all the security audit boxes. It's also a lot more expensive of course, but still&nbsp;<i>much&nbsp;</i>cheaper than running my own comparable infrastructure. I am betting that DocumentDb will go through a similar rapid evolution<br /><br /></div>

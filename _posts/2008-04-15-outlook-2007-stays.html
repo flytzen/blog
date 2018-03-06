@@ -1,0 +1,13 @@
+---
+layout: post
+title: Outlook 2007 stays "disconnected"
+date: '2008-04-15T14:16:00.002+01:00'
+author: Frans Lytzen
+tags:
+- Technology
+modified_time: '2008-04-17T09:40:34.006+01:00'
+blogger_id: tag:blogger.com,1999:blog-8302357413081836531.post-8727350540369252330
+blogger_orig_url: http://blog.lytzen.name/2008/04/outlook-2007-stays.html
+---
+
+<p>Sometimes I do these things just to try them out... For example, I recently got a new laptop and decided to install Vista 64-bit on it and Office 2007. I have the IT team reporting to me so it makes sense that I try out some stuff and I tend to be able to help myself enough that I don't cause a drain on their resources. I decided a while ago not to upgrade our internal systems to Vista or Office 2007 for a while yet. Vista partly because of the hardware requirements which we can't meet, partly because it is still flaky - even after service pack 1. Office 2007 because the UI is so different that it will just cause a lot of calls to the IT Helpdesk and I can't see any real benefits in the new version - it is mainly window dressing with little substance.</p><p>But I digress... One of the problems I have had with my setup is that often when I switch between the wireless and the wired network (many times a day - the curse of being in and out of meetings) Outlook 2007 will go into "disconnected" mode and will stubbornly stay there. Normally a reboot will sort it out but not today so I decided to do a bit of digging. It turns out this is well-known problem in Outlook 2007 and I have seen reports back from May 2007 - but still no fix from Microsoft. They do have this <a href="http://support.microsoft.com/kb/913843">article</a> but the "solution" in there doesn't work and is in any case unrelated IMHO (it only deals with RPC, I have the same problem with pure HTTP)...</p><p>However, some kind soul on a message board revealed the secret: you need to run "ipconfig /dnsflush" in a command window and it sorts it out. Mind you, you need to do this each time you see the problem. Would be nice to see a fix to this problem...</p>

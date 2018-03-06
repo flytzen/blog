@@ -1,0 +1,35 @@
+$break-small: 600px;  // This is the same as what the default menu uses
+
+div.homebox {
+  margin: 0.5em;
+  padding: 0.5em;
+  border: silver solid 1px;
+  flex: 1;
+  h2 {
+    text-align: center;
+  }
+  ul.post-list {
+    h3 {
+      margin: 0;
+    }
+    li {
+      margin-bottom: 0.5em;
+    }
+  }
+  .excerpt {
+    font-size: 0.8em;
+    font-style: italic;
+  }
+}
+
+.post-meta {
+  display:flex;
+  flex-direction: column;
+
+  @media all and (min-width: $break-small) {
+    flex-direction: row;
+    .post-tags {
+      margin-left: auto;
+    }
+  }
+}

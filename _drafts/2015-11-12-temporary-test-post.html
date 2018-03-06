@@ -1,0 +1,12 @@
+---
+layout: post
+title: Temporary test post
+date: '2015-11-12T17:15:00.000Z'
+author: Frans Lytzen
+tags: 
+modified_time: '2015-11-12T17:15:36.930Z'
+blogger_id: tag:blogger.com,1999:blog-8302357413081836531.post-6246382211696348180
+blogger_orig_url: http://blog.lytzen.name/2015/11/temporary-test-post.html
+---
+
+This is just a temporary test post.<br /><br /><pre class="prettyprint">using System;<br />using System.Collections.Generic;<br />using System.Diagnostics;<br />using System.Linq;<br />using System.Threading.Tasks;<br />using Microsoft.Framework.Caching.Memory;<br />using Microsoft.Framework.Logging;<br />using NewOrbit.Time.HarvestClient.HarvestTypes;<br />using Newtonsoft.Json;<br /><br />namespace NewOrbit.Time.HarvestClient<br />{<br />    public class HarvestClient<br />    {<br />        private readonly string subdomain;<br />        private readonly string userName;<br />        private readonly string password;<br />        private readonly ILogger logger;<br />        private readonly IMemoryCache cache;<br />        private RawHarvestClient rawClient;<br /><br />        public HarvestClient(string subdomain, string userName, string password, ILogger logger, IMemoryCache cache)<br />        {<br />            this.subdomain = subdomain;<br />            this.userName = userName;<br />            this.password = password;<br />            this.logger = logger;<br />            this.cache = cache;<br />            this.rawClient = new RawHarvestClient(logger, cache, subdomain, userName, password);<br />        }</pre><pre class="prettyprint">}</pre><pre class="prettyprint">}<br /><br /><br /></pre>

@@ -1,0 +1,12 @@
+---
+layout: post
+title: ".URL files and IIS"
+date: '2009-10-15T12:24:00.001+01:00'
+author: Frans Lytzen
+tags: 
+modified_time: '2009-10-15T12:32:10.074+01:00'
+blogger_id: tag:blogger.com,1999:blog-8302357413081836531.post-5730160859432360096
+blogger_orig_url: http://blog.lytzen.name/2009/10/url-files-and-iis.html
+---
+
+<p>A client wanted the ability for his users to easily “put an icon on their desktop linking to the site”.</p>  <p><a href="http://www.lytzen.name/blogimages/466443aed9cb.URLfilesandIIS_AE7A/image.png"><img style="border-right-width: 0px; display: inline; border-top-width: 0px; border-bottom-width: 0px; margin-left: 0px; border-left-width: 0px; margin-right: 0px" title="Example of saving a link to desktop" border="0" alt="Example of saving a link to desktop" align="right" src="http://www.lytzen.name/blogimages/466443aed9cb.URLfilesandIIS_AE7A/image_thumb.png" width="244" height="181" /></a> Now, that is actually a bit more tricky than it sounds in this day and age of restrictive security in browsers. Running a script is out of the question and I don’t want to download and run an application. Now, users’ internet shortcuts on their desktops are just .url files so a very simple solution is to just stick a “my site.url” file on the server and add a link to it. When the user clicks on it they will be asked to download it and can just save it to their desktop – easy!</p>  <p>If Internet Explorer is their default browser and you have specified a favicon in the webpage then your favicon will even be displayed on the user’s desktop.</p>  <p>Now, just one problem… By default, IIS won’t let you download .url files so when the user clicks on the link you will get a 404 error. In order resolve this, go into MIME Types for IIS and add .url as an extensions. I used “application/internet-shortcut” for the MIME type but there may be better choices. You will have to do an IISRESET for the new setting to kick in…</p>  
