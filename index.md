@@ -9,23 +9,36 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
 My next talk will be on <a href="https://www.meetup.com/dotnetoxford/events/247607774/">how to secure your web apps in Azure at .Net Oxford on 24 April</a>
 </p>
 
-<div class="homebox">
-    <h2><a href="/blog/">Blog</a></h2>
-        <ul class="post-list">
-            {% for post in site.posts limit:3 %}
-            <li>
-                <h3>
-                    <a href="{{ post.url | relative_url }}">
-                        {{ post.title | escape }}
-                    </a>
-                </h3>
-                <div class="excerpt">
-                    {{ post.excerpt | strip_html | truncatewords: 30 }}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
+<div class="homeboxes">
+    <div class="homeblogbox">
+        <h2><a href="/blog/">Blog</a></h2>
+            <ul class="post-list">
+                {% for post in site.posts limit:4 %}
+                <li>
+                    <h3>
+                        <a href="{{ post.url | relative_url }}">
+                            {{ post.title | escape }}
+                        </a>
+                    </h3>
+                    <div class="excerpt">
+                        {{ post.excerpt | strip_html | truncatewords: 30 }}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
 
-        <a href="/blog">More...</a>
+            <a href="/blog">More...</a>
+    </div>
+    <div class="homesidebar">
+        <div>
+            <h2><a href="/talks/">Speaking</a></h2>
+            <h3><a href="https://www.meetup.com/dotnetoxford/events/247607774/">How to secure your web app in Azure</a></h3>
+            <small>April 24, .Net Oxford</small>
+        </div>
+        <div>
+            <a class="twitter-timeline" href="https://twitter.com/flytzen" data-height="300">Tweets by @flytzen</a>
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+        </div>
+    </div>
 </div>
 
