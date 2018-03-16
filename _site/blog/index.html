@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Blog</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="" />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="home">
+    <h1 class="page-heading">Blog posts</h1>
+    <div>
+        <h2 class="post-list-heading">Posts</h2>
+        <ul class="post-list">
+        
+        <li>
+            
+            <span class="post-meta">Jun 29, 2017</span>
+            <h3>
+            <a class="post-link" href="/2017/06/29/azure-failover-and-resilience.html">
+                Azure Failover and Resilience
+            </a>
+            </h3>
+            Azure provides a highly resilient hosting platform, with significant built-in redundancy, but it can be hard to understand what resilience you get automatically and what you might have to set up yourself.
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jan 30, 2017</span>
+            <h3>
+            <a class="post-link" href="/2017/01/30/combine-documents-with-other-data-in.html">
+                Combine documents with other data in Azure Search
+            </a>
+            </h3>
+            Azure Search has built-in support for indexing documents in blob storage, which works great. But what if you want to combine&nbsp;the documents with other data, for example if you are building a recruitment system and want to search on, say, location and CV content at the same time?TL;DR; Indexers in...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jan 6, 2017</span>
+            <h3>
+            <a class="post-link" href="/2017/01/06/how-many-ways-can-i-host-web-app-in.html">
+                How many ways can I host a web app in Azure?
+            </a>
+            </h3>
+            I got talking to a colleague about how many ways there are to host web apps in Azure and even managed to surprise myself by just how many ways I could think of. It inspired me to compile this list, which is just off the top of my head. I'm...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Dec 6, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/12/06/find-docs-with-no-partitionkey-in-azure.html">
+                Find docs with no PartitionKey in Azure DocumentDb
+            </a>
+            </h3>
+            When you are using Partitioned Collections in Azure DocumentDb you need to specify a Partition Key on each Document. At least, I thought you did. But, it turns out that you actually can&nbsp;save documents without a partitionkey. But if you do, you'll have a hard time retrieving or deleting them...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Sep 29, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/09/29/find-documents-with-missing-properties.html">
+                Find Documents with missing properties in Azure DocumentDb with the .Net SDK
+            </a>
+            </h3>
+            Azure DocumentDb stores documents as JSON. One of the effects of this is that sometimes you may end up with documents in the database that have missing properties and it can be quite tricky to search for them with the .Net SDK. This blog post has an approach to doing...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Aug 26, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/08/26/auto-publish-azure-web-jobs-with-aspnet.html">
+                Auto publish Azure Web Jobs with ASP.Net Core RTM
+            </a>
+            </h3>
+            This is an update of my original post on how to do this with ASP.Net Core RC1At the time of this writing, there is no tooling to auto publish Azure Web Jobs with an ASP.Net Core website. You can do it with old-style websites, but not yet the new ones....
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Aug 25, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/08/25/infosec-with-sql-azure.html">
+                InfoSec with SQL Azure
+            </a>
+            </h3>
+            I've been using SQL Azure since 2011 and it's been a journey. One of the big problems I used to have was passing security audits from some of our clients; We deal with a &nbsp;lot of data that is highly sensitive so are under a lot of scrutiny to make...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jul 15, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/07/15/reactjs-clicking-for-me.html">
+                How React.js suddenly clicked
+            </a>
+            </h3>
+            I've been working with Angular 1.0 for a few years and have been looking at other frameworks to move to in the last six months or so, including Angular 2.0, Aurelia, Ember and React. This post is not about which is best, it's about the mental block I had on...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">May 12, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/05/12/azure-documentdb-go-faster-button.html">
+                Azure DocumentDb Go-Faster button
+            </a>
+            </h3>
+            "Premature optimisation is the root of all evil."That said, if you are using DocumentDb with the .Net client please do two things in your code right now. They are safe and they will speed up your database access - potentially by several orders of magnitude. I delayed putting it into...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Mar 29, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/03/29/auto-deploy-azure-web-job-with-aspnet-5.html">
+                Auto deploy Azure Web Job with ASP.Net 5 and source control deploy
+            </a>
+            </h3>
+            UpdateAn updated version of this post that targets ASP.Net Core RTM is now available.The content below here refers to RC1 which is not supported on AzureAt the time of this writing, there is no tooling to auto publish Azure Web Jobs with an ASP.Net 5 (DNX) website. You can do...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Feb 20, 2016</span>
+            <h3>
+            <a class="post-link" href="/2016/02/20/playing-with-cors.html">
+                Playing with CORS
+            </a>
+            </h3>
+            I recently had reason to get to understand CORS in a bit more detail and I wanted to share what I learned. I did this with ASP.Net 5 / MVC6 but the principles apply more broadly.This post is not&nbsp;about how to set up the built-in CORS middleware, but rather about...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Aug 13, 2015</span>
+            <h3>
+            <a class="post-link" href="/2015/08/13/bt-customer-service-epic-fail.html">
+                BT Customer Service Epic Fail
+            </a>
+            </h3>
+            I am posting this here as it may be a useful illustration of how overly optimising processes can lead to incredibly poor customer service. Or maybe I am just ranting. In any case, this is a copy of a letter of complaint to BT, who has managed to completely mess...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jul 28, 2015</span>
+            <h3>
+            <a class="post-link" href="/2015/07/28/using-azure-management-libraries-from.html">
+                Using Azure Management Libraries from Azure Web Jobs
+            </a>
+            </h3>
+            In this post I will show how to set up an Azure Web Job to automatically reboot a worker role at certain times. It's just an example, you can schedule pretty much any Azure operation in this way, including shutting down VMs at the end of the day etc.Azure Management...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jul 14, 2014</span>
+            <h3>
+            <a class="post-link" href="/2014/07/14/ng-datalist-working-title-wish-list.html">
+                ng-dataList (working title) wish list
+            </a>
+            </h3>
+            This post is primarily a set of notes to myself on what I would like to see in a new “data list” angular component. It’s here on my blog for easy sharing. Background At NewOrbit we build a range of web-based applications for our clients and partners. Mostly they have...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Oct 30, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/10/30/hitting-limits-in-sql-azure.html">
+                Hitting the limits in SQL Azure
+            </a>
+            </h3>
+            We use SQL Azure for most of our systems. For the most part, it “just works” and it is dead easy to get set up and start using. The main challenge facing most people is the need to handle retries, which is far from simple – but if you use...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Aug 15, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/08/15/continuous-deployment-to-azure-cloud.html">
+                Continuous deployment to Azure Cloud Services
+            </a>
+            </h3>
+            When you use Azure Websites you can do continuous deployment using Git, but with cloud services you can only do it from TFS. Luckily, it is quite easy to set up a Powershell script to deploy to Cloud Services. In this post I will share a sample script that can...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">May 6, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/05/06/real-world-corporate-browser-stats.html">
+                Real-world Corporate Browser Stats
+            </a>
+            </h3>
+            Paul Irish recently said on twitter “Very surprised how many developers actively support IE7 despite it's miniscule usage now. Let's move on!” referencing StatCounter showing IE7 having 0.64% usage. A bit of a conversation followed about corporate users and the question was raised about what the stats actually looks like...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">May 1, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/05/01/hard-windows-workflow-lessons-from-azure.html">
+                Hard Windows Workflow Lessons from Azure
+            </a>
+            </h3>
+            This post is about some issues we experienced with Workflows on Windows Azure after running successfully for over a year. We effectively had system down for several days until we got to the root of the problem. Not all of it is specific to Azure; there is information in here...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Apr 7, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/04/07/testing-webconfig-transforms-with.html">
+                Testing Web.Config Transforms with ApprovalTests
+            </a>
+            </h3>
+            In this post I will show how you can write a test with your favourite unit test framework that will apply your web.config transformation and compare the result to a master. ApprovalTests will make it easy to update the master when you make deliberate changes and will alert you when...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Mar 18, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/03/18/using-aspnet-mvc-without.html">
+                Using ASP.Net MVC without a MembershipProvider
+            </a>
+            </h3>
+            Most people when they get to securing their ASP.Net MVC applications and managing users look to the MembershipProvider and the RoleProvider – or the new SimpleMembership. For many projects you then quickly realise that they don’t quite do what you want and you end up implementing your own versions of...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jan 19, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/01/19/entity-framework-migrations-seeding-and.html">
+                Entity Framework Migrations, seeding and server farms
+            </a>
+            </h3>
+            Entity Framework Migrations offers a way to evolve your database schema over time. The schema is fine, but what about your actual data? You may have configuration settings in the database and how do you handle it when you need to add a new configuration setting?With Entity Framework Migrations enabled,...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jan 10, 2013</span>
+            <h3>
+            <a class="post-link" href="/2013/01/10/how-to-mock-restsharpexecuteasync.html">
+                How to Mock RestSharp.ExecuteAsync
+            </a>
+            </h3>
+            It took me a while to figure out how to Mock RestSharp’s ExecuteAsync method for unit testing purposes. Once you realise that ExecuteAsync takes a callback which is called when the REST call completes it all becomes reasonably straightforward, using Mocks Callback function;Mock&lt;IRestClient&gt; restClient = new Mock&lt;IRestClient&gt;(); restClient.Setup(c =&gt; c.ExecuteAsync&lt;MyResult&gt;(...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Apr 25, 2012</span>
+            <h3>
+            <a class="post-link" href="/2012/04/25/windows-workflow-foundation-4-state.html">
+                Windows Workflow Foundation 4 State Machine and tight loops
+            </a>
+            </h3>
+            I am a big fan of Windows Workflow. Sure, there are a lot of barriers to get started and a lot of idiosyncrasies, but once you get past that, it can do an awful lot to help with building large, complex systems. One issue I have come across recently is...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Feb 25, 2012</span>
+            <h3>
+            <a class="post-link" href="/2012/02/25/entity-framework-code-first-inheritance.html">
+                Entity Framework Code First, Inheritance and ComplexType
+            </a>
+            </h3>
+            In one of the applications we are working on, we have a pretty complex inheritance hierarchy which is mapped to SQL Server using Entity Framework 4.3 using Code First. We noticed that when selecting from the base type just on ID we had terrible performance. Some investigation revealed that the...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Mar 7, 2010</span>
+            <h3>
+            <a class="post-link" href="/2010/03/07/moving-ts-profiles-and-home-drives-to.html">
+                Moving TS Profiles and Home Drives to another server
+            </a>
+            </h3>
+            I recently found myself in the situation of having to move the Terminal Server user profiles and the Home Drives directory from one server to another. There are similar challenges involved to moving Roaming Profiles, because you do not have access rights to the user’s profile directory, so you can’t...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Feb 28, 2010</span>
+            <h3>
+            <a class="post-link" href="/2010/02/28/file-upload-failed.html">
+                File Upload Failed
+            </a>
+            </h3>
+            I have just migrated my blog from FTP publishing to a custom domain on Blogspot. I tend to use Windows Live Writer to write blog posts, but the image publishing didn’t work; If I tried to upload an image through Live Writer I got a “File Upload Failed” with the...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Oct 15, 2009</span>
+            <h3>
+            <a class="post-link" href="/2009/10/15/url-files-and-iis.html">
+                .URL files and IIS
+            </a>
+            </h3>
+            A client wanted the ability for his users to easily “put an icon on their desktop linking to the site”. Now, that is actually a bit more tricky than it sounds in this day and age of restrictive security in browsers. Running a script is out of the question and...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Sep 28, 2009</span>
+            <h3>
+            <a class="post-link" href="/2009/09/28/new-website-for-neworbit-goes-live.html">
+                New website for NewOrbit goes live
+            </a>
+            </h3>
+            We have just developed and gone live with a new website for NewOrbit Ltd. NewOrbit is the company I run with Sean, where we develop custom-fit, web-based solutions for our clients. It’s an exciting venture which we have spent the last year getting fully up and running. It’s high on...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Jul 27, 2009</span>
+            <h3>
+            <a class="post-link" href="/2009/07/27/first-employee-first-office.html">
+                First employee, first office
+            </a>
+            </h3>
+            Today was a big day in the life of NewOrbit. Our first employee, Technical Director Pete Kendall, joined us and we moved into a joint office. Sean (co-owner of NewOrbit) and I&#160; have so far been working out of our respective homes but with new staff joining us, it was...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Apr 15, 2008</span>
+            <h3>
+            <a class="post-link" href="/2008/04/15/outlook-2007-stays.html">
+                Outlook 2007 stays &quot;disconnected&quot;
+            </a>
+            </h3>
+            Sometimes I do these things just to try them out... For example, I recently got a new laptop and decided to install Vista 64-bit on it and Office 2007. I have the IT team reporting to me so it makes sense that I try out some stuff and I tend...
+        </li>
+        
+        <li>
+            
+            <span class="post-meta">Apr 14, 2008</span>
+            <h3>
+            <a class="post-link" href="/2008/04/14/why-write-blog.html">
+                Why write a blog?
+            </a>
+            </h3>
+            Ever since I left Denmark I've maintained a blog in Danish, on and off, to keep my friends and family back home updated on what I am up to. As time has gone by, I found myself updating it less and less frequently - not least because I found it...
+        </li>
+        
+        </ul>
+
+        <p class="rss-subscribe">subscribe <a href="/feed.xml">via RSS</a></p>
+    </div>
+    <div>
+        over to the right, should have the tags that a user can click on
+    </div>
+</div>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

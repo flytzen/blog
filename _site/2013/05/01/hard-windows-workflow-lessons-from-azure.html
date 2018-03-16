@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Hard Windows Workflow Lessons from Azure</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="This post is about some issues we experienced with Workflows on Windows Azure after running successfully for over a year. We effectively had system down for several days until we got to the root of the problem. Not all of it is specific to Azure; there is information in here..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Hard Windows Workflow Lessons from Azure</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2013-05-01T21:42:00+01:00" itemprop="datePublished">
+          
+          May 1, 2013
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Azure">Azure</a>
+        &nbsp;
+        
+        <a href="/tags/#SQL">SQL</a>
+        &nbsp;
+        
+        <a href="/tags/#WWF">WWF</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This post is about some issues we experienced with Workflows on Windows Azure after running successfully for over a year. We effectively had system down for several days until we got to the root of the problem. Not all of it is specific to Azure; there is information in here about certain circumstances where workflow timers won’t fire as well as information about circumstances where “warming up” a workflow service can cause your service to hang – as well as information about some scenarios where you can run into problems with SQL Azure. It’s a bit of a hodgepodge.</p> <p>The system discussed here uses Windows Workflow 4.0 and .Net 4.0 and the default SQL Persistence Store.</p> <h2>Background</h2> <p>The system we are running on Azure using Windows Workflows has about 100 different workflow definitions and is fairly high traffic with approximately 7,000 new workflow instances being started every day, all of them long running - from hours to weeks.</p> <p>After running successfully for about a year, one Friday afternoon we started seeing a lot of timeouts when we tried to start or progress workflows. We took the system down and got it back up again for the weekend. On Monday it was fine and then on Tuesday afternoon it died again – and we took it offline and it was okay again for Wednesday morning. Wednesday afternoon it died again and we finally got to the root of the problem on Wednesday night and solved it. </p> <h2>The database side of the problem</h2> <p>We had several different factors conspiring to cause us significant problems. </p> <ol> <li>Over time our workflow database has grown as we (stupidly) chose to keep all history in there instead of letting the workflow engine delete instances when they completed. At the time the problems started, we had almost a million completed workflows in the database. </li> <li>The workflow engine does a high number of writes to the database and over time that leads to index fragmentation – and on Azure there is no easy way to re-index the database.&nbsp; </li> <li>For one reason or another, the workflow engine had built up a backlog of several thousand workflow instances that had overdue timers. This had happened slowly over a period of time and was probably individually due to some of those “connectivity issues” you are told to expect on SQL Azure. There are also scenarios where timers can be blocked from firing which would increase the back log – see below.</li> <li>In certain scenarios, such as bringing a new server online or rebooting a server, the workflow engine will trigger clean-up processes that will attempt to clear the backlog of overdue timers from the RunnableInstances table. <br>Note that each workflow type that you have will run its own clean-up routine as they are individual services. We have over 100 different workflow definitions in the system and when starting a server we have a warmup routine that goes through them and makes sure they are all primed (otherwise timers won’t fire) – this will also trigger the clean up routines and is essential. Our process that pauses between each workflow warmup to give the server a chance to recover, but as soon as the server is online a user may hit a given workflow definition and thus trigger the clean-up,</li> <li>One of the benefits of SQL Azure is that all databases are replicated three times. However, if you are doing a very large amounts of writes to a database (such as when you are trying to clean up) and the database is slow or has heavily fragmented indexes, SQL Azure’s replication engine will tell you to back off and slow down – which is what happened to us when the cleanup routines were all trying to run at the same time and we had a huge backlog to clear.</li> <li>The workflow engine had the default connection timeout so would typically time out when told to back off but, crucially, also has retry logic so will keep trying to do its job up to 15 times. </li></ol> <p>When you combine all of these factors, essentially what you would see is a server trying to do the clean-up, which would cause a lot of writes to the database, which was already slow, which would in turn cause SQL Azure to tell the workflow engine to back off, which would then cause the user to time out and the workflow engine to keep re-trying. The way this would manifest is that the system would start intermittently timing out when interacting with workflows and then, as more and more retries were being done, eventually the SQL Server would reach its connection limit of 180 concurrent connections and would block all connection attempts - which then leads to more retries and the system going into complete gridlock. <p>So, on the Friday we saw an initial problem which may have been unrelated, but we then responded by adding more servers, which triggered the clean-up routine and eventually brought the system down. On Tuesday something else triggered the same chain reaction and on Wednesday morning we decided to bring another server online to deal with the level of activity from the users who were trying to catch up on work from Tuesday, again triggering the same chain reaction.  <p>We had two instances where we took the system offline and rebooted the servers which calmed the situation down. As the servers were coming back up they started warming up workflows and running clean up routines, which looked good in our staging environment. However, as we then switched it over to production and let users back in, the users would try to catch up with their work and that would cause a cascade that eventually took the system down again as the database was being overloaded.  <h2>Things you can do overcome the database issues</h2> <ol> <li>Delete completed workflows from the database. At least get rid of the old ones but also consider setting the instanceCompletionAction="DeleteAll" in Web.Config.</li> <li>If you are able to take your system offline, the easiest way in my experience to reindex and clean up your database on Azure is to <em>rename</em> your workflow database and then do “create database as copy of” to create a new live copy; This copy is actually rebuilt from the data. In our scenario and to give you and idea about the difference it can make; The original database with the 1 million completed workflows was about 4GB in size. We tried to run a query to delete ~700,000 completed workflows but cancelled that query after waiting for 18 minutes. We then created a copy with the “create database as copy of” and ran the same query which ran in just over one minute which is pretty dramatic in anyone’s money.<br> Incidentally, the copy was about 25% smaller before we started deleting any data. for good measure we of course did the copy trick again after cleaning up the database.</li> <li>If you have a backlog of pending timers in your RunnableInstances table, it is vital you let the workflow engine clear them all out. There are things that can stop pending timers from firing (see below) and if you let them build up a backlog, you will eventually end up with a system going down so put some monitoring in place and deal with the problem early.</li> <li>Increase the timeouts on the workflow database connections to reduce the risk of retries overwhelming the SQL server. Whether the timeout on the connection string is actually respected by the workflow engine I have no idea, but it can’t hurt.</li></ol> <h2>Things that can cause workflow timers not to fire</h2> <ol> <li>We found that we had a number of workflows in the RunnableInstances table with a timer in the past but the related instance in the Instance table was marked as Completed. This seems to completely baffle the workflow engine and it doesn’t just ignore that one instance but it seems to stop other timers from firing too. Not all, but many – it seems mildly non-deterministic. So, it is vital you monitor your RunnableInstances table for timers in the past and then investigate. If the real instance is closed, you can just delete the entry from the RunnableInstances table, restart your server and you will see the cleanup routine start moving through the next pending timers.</li> <li>Not directly related to our woes above, but we also found that some instances don’t appear in the RunnableInstances table when they should. As far as we have been able to figure, the root cause is something like this; Workflow instances can be “locked” by having a SurrogateLockOwnerId assigned to them, which corresponds to an entry in the LockOwners table. One of the clean up routines will clean up expired locks and put workflow instances back in the RunnableInstances table if for whatever reason the “LockOwner” did not finish with it. However, it seems that a situation can arise whereby a workflow instance in the Instances table can be marked with a SurrogateLockOwnerId which does <em>not</em> exist in the LockOwners table. If that happens, it would appear that that instance never gets recovered and never gets back into the RunnableInstances table. Again, something you need to monitor for, We haven’t tested it, but it should be possible to just clear out the SurrogateLockOwnerId from the affected instances in the Instances table and that should clear it up – but you really want to test it first.</li></ol> <h2>In conclusion</h2> <p>Before all of this happened we had treated the whole workflow engine as a bit of a black box and were, frankly, a bit scary of messing with it. We also trusted it too much. Now we have learned a great deal more about the internals of the SQL Persistence Store and have learned how all the bits hang together, how to monitor for problems and how to clear out duff data early before it can start causing problems. The key lesson is to not trust the workflow engine to be able to handle all types of problems.</p>  
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2013/05/01/hard-windows-workflow-lessons-from-azure.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

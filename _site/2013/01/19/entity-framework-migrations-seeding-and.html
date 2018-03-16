@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Entity Framework Migrations, seeding and server farms</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="Entity Framework Migrations offers a way to evolve your database schema over time. The schema is fine, but what about your actual data? You may have configuration settings in the database and how do you handle it when you need to add a new configuration setting?With Entity Framework Migrations enabled,..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Entity Framework Migrations, seeding and server farms</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2013-01-19T16:19:00+00:00" itemprop="datePublished">
+          
+          Jan 19, 2013
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#EntityFramework">EntityFramework</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    Entity Framework Migrations offers a way to evolve your database schema over time. The schema is fine, but what about your actual data? You may have configuration settings in the database and how do you handle it when you need to add a new configuration setting?<br />With Entity Framework Migrations enabled, your seeder function will run every time you restart your application, so as long as your new configuration setting is in your seeder all will be well. Well, sort of... How do you avoid adding a duplicate row the next time your application is restarted? A simple answer with Code First would be something like;<br /><br /><div class="wlWriterEditableSmartContent" id="scid:f32c3428-b7e9-4f15-a8ea-c502c7ff2e88:6bdf356e-9e4c-48fd-b8a9-3987896b283c" style="display: inline; float: none; margin: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px; padding-top: 0px;"><pre class="prettyprint">if (!context.Entries.Any(e =&gt; e.Value.Equals(value)))<br />{<br />    var entry = new Entry() { // initialize };<br />    context.Entries.Add(entry);<br />    context.SaveChanges();<br />}</pre></div><br /><br />That works well until you have more than one server as you may then have two or more servers running this code at the same time.<br />Personally I happen to use Azure so I always have at least two servers.<br /><br />In Entity Framework 5 you have the AddOrUpdate extension method but you may not always want to <i>update&nbsp;</i>stuff - sometimes you may want to insert it if it doesn't exist and otherwise leave it alone. Or you may be using EF4.<br /><br />The key to handling this is to obtain a table lock before you check and insert. Now, table locks are normally very bad things because it stops other users from reading from the table – which is of course what you want in this scenario – but you do need to carefully consider any adverse effect this may have on your application. <a href="https://twitter.com/tpeplow">Tom Peplow</a> has a a very good <a href="http://peplowdown.wordpress.com/2010/07/18/locking-across-servers-table-locks-with-entity-framework/">article</a> on how to achieve table locks with Entity Frameworks. I have adapted his approach for use specifically when seeding with Code First.<br /><br />For the examples below, I am imagining an entity called “Entry” and the underlying database table is called “Entries”. Entry has a “Value” property which is the one I want to be unique in my example, but just replace the lambdas as required for your needs.<br /><br />The code below will obtain a table lock before checking and inserting;<br /><br /><div class="wlWriterEditableSmartContent" id="scid:f32c3428-b7e9-4f15-a8ea-c502c7ff2e88:c58d6d4d-fe87-4f48-8aa1-5a8400cd5ee8" style="display: inline; float: none; margin: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px; padding-top: 0px;"><pre class="prettyprint">using (var scope = new TransactionScope(<br />        TransactionScopeOption.Required,&nbsp;<br />        new TransactionOptions()&nbsp;<br />            { IsolationLevel = IsolationLevel.ReadCommitted })                            )<br />    {<br />    context.Database.ExecuteSqlCommand(<br />        "select 1 from Entries with (tablockx, holdlock) where 0 = 1");<br />    if (!context.Entries.Any(e =&gt; e.Value.Equals(value)))<br />    {<br />        var entry = new Entry() { // Initialize };<br />        context.Entries.Add(entry);<br />        context.SaveChanges();<br />    }<br />    <br />    scope.Complete();<br />}</pre></div><br /><br />If you find yourself needing to do this a lot, you could create an extension method like this, which can work for any entity and table;<br /><br /><div class="wlWriterEditableSmartContent" id="scid:f32c3428-b7e9-4f15-a8ea-c502c7ff2e88:0f4aa2d3-e3bc-4def-851e-3bf95357741b" style="display: inline; float: none; margin: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px; padding-top: 0px;"><pre class="prettyprint">public static class DbContextExtensions<br />{<br />    public static bool UniqueInsert&lt;TContext, TEntity&gt;(<br />        this TContext context,&nbsp;<br />        Func&lt;TContext, IDbSet&lt;TEntity&gt;&gt; dbSetAccessor,&nbsp;<br />        TEntity entity,&nbsp;<br />        Func&lt;TEntity,bool&gt; areSame,&nbsp;<br />        string underlyingTableName)&nbsp;<br />        where TContext : DbContext&nbsp;<br />        where TEntity : class<br />    {<br />        using (var scope = new TransactionScope(<br />                  TransactionScopeOption.Required,&nbsp;<br />                  new TransactionOptions()&nbsp;<br />                     { IsolationLevel = IsolationLevel.ReadCommitted }))<br />        {<br />            try<br />            {<br />                context.Database.ExecuteSqlCommand(<br />                    String.Format("select 1 from {0} with (tablockx, holdlock) where 0 = 1",&nbsp;<br />                    underlyingTableName));<br />                var set = dbSetAccessor(context);<br />                if (!set.Any(areSame))<br />                {<br />                    set.Add(entity);<br />                    context.SaveChanges();<br />                    return true;<br />                }<br />                return false;<br />            }<br />            finally<br />            {<br />                scope.Complete();                    <br />            }<br />        }<br />    }<br />}</pre></div><br />And call it like this:<br /><br /><div class="wlWriterEditableSmartContent" id="scid:f32c3428-b7e9-4f15-a8ea-c502c7ff2e88:a53f661e-9377-40ae-b4e8-2b9c4264c7bd" style="display: inline; float: none; margin: 0px; padding-bottom: 0px; padding-left: 0px; padding-right: 0px; padding-top: 0px;"><pre class="prettyprint">var entry = new Entry() { // initialize };<br />context.UniqueInsert(<br />    c =&gt; c.Entries,&nbsp;<br />    entry ,&nbsp;<br />    dbEntity =&gt; dbEntity.Value.Equals(entry.Value),&nbsp;<br />    "Entries");</pre></div>
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2013/01/19/entity-framework-migrations-seeding-and.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Auto deploy Azure Web Job with ASP.Net 5 and source control deploy</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="UpdateAn updated version of this post that targets ASP.Net Core RTM is now available.The content below here refers to RC1 which is not supported on AzureAt the time of this writing, there is no tooling to auto publish Azure Web Jobs with an ASP.Net 5 (DNX) website. You can do..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Auto deploy Azure Web Job with ASP.Net 5 and source control deploy</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2016-03-29T21:37:00+01:00" itemprop="datePublished">
+          
+          Mar 29, 2016
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Azure">Azure</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2>Update</h2>An updated version of this post that targets ASP.Net Core RTM <a href="http://blog.lytzen.name/2016/08/auto-publish-azure-web-jobs-with-aspnet.html">is now available</a>.<br /><br /><br /><br /><br /><br /><h2>The content below here refers to RC1 which is not supported on Azure</h2><div><br /></div><div><br /></div>At the time of this writing, there is no tooling to auto publish Azure Web Jobs with an ASP.Net 5 (DNX) website. You can do it with old-style websites, but not yet the new ones. The tooling is highly likely to appear as we get closer to release, but as of right now you have to take a few steps to set it up yourself, which is what I describe in this post. For clarity, what I am describing works only with source control deploy (git etc), <i>not</i>&nbsp;with publishing from Visual Studio.<br /><br /><b>This information will become obsolete nearer to the release of ASP.Net 5. If that has happened and I have not updated the post, please post a comment and I'll get on it.</b><br />Note that for very simple, self-contained web jobs, there may be a simpler approach (see&nbsp;<a href="http://stackoverflow.com/a/33291097/11534">http://stackoverflow.com/a/33291097/11534</a> for some thoughts). In this post I am catering for the scenario where your webjob references another project in your solution - though it'll work just as well if it doesn't.<br /><br /><h3>In summary</h3><div>You have to use a custom deployment script and insert an action to <i>publish</i>&nbsp;your webjob to the path that Azure looks for webjobs in; App_Data/Jobs/Continuous for continuous jobs. Azure will automatically pick up on content in that folder. And yes, it will happily overwrite a running webjob.<br /><br />The reason we are <i>publishing, </i>using DNU Publish, is to effectively build the web job and get all it's dependencies. Of course, once RC2 is out we'll probably have to change the syntax.<br />If we had a very simple webjob that was self contained, you could just copy&nbsp;the files, as long as you added a <i>run.cmd</i>&nbsp;(see link above).<br /><br /></div><h3>In detail</h3><div><a href="https://github.com/flytzen/AutoDeplyAzureWebJob">Full example on Github</a>.<br /><br /><h4>Prepare a site</h4><br /><ol><li>Set up a solution with an ASP.Net 5 Web site and a webjob written as a ASP.Net 5 / Core console app.</li><li>Set up source control deploy to an Azure website. It shouldn't matter which type.</li><li>Wait for the initial deploy of the site.&nbsp;</li></ol><br /><h4>Set up a custom deployment script</h4></div><div>In this example, we will download the deployment script that Azure has created. There are ways to also do this with the Azure CLI, but the generated script is not quite the same at this point in time - which may or may not matter.</div><div><ol><li>Get the auto generated script</li><ol><li>Log in to the web app console at https://[yoursite].scm.azurewebsites.net</li><li>Select Debug Console -&gt; Powershell</li><li>Navigate to site/deployments/tools</li><li>Download the file deploy.cmd to the root of your solution folder</li></ol><li>Create a file in the root of your solution folder called .deployment with the following content<br /><pre class="prettyprint">[config]<br />command = deploy.cmd<br /></pre></li><li>Modify your deploy.cmd file in the following ways</li><ol><li>Add a line like this near the top - just to make it easier to check that your custom script is being used (whatever you put after echo will be output in the log file)<br /><pre class="prettyprint">echo CUSTOM SCRIPT Start<br /></pre></li><li>Near the middle of the file you will find a series of steps that are numbered. One of the steps will look like this; <br /><strong>NOTE: The indented lines will be on a single line, the line breaks are only added here for readability</strong><br /><pre class="prettyprint">:: 4. Run DNU Bundle<br />call %DNX_RUNTIME%\bin\dnu publish<br />  "D:\home\site\repository\src\Web\project.json" <br />  --runtime %DNX_RUNTIME% <br />  --out "%DEPLOYMENT_TEMP%" <br />  %SCM_DNU_PUBLISH_OPTIONS%<br />IF !ERRORLEVEL! NEQ 0 goto error<br /></pre></li><li>Below that insert these lines (updating the path with the actual path to your webjob in the solution)<br /><strong>NOTE: The indented lines need to put on a single line, the line breaks are only here for readability</strong><br /><pre class="prettyprint">:: 4.1 build web job<br />echo Starting to build webjob<br />call %DNX_RUNTIME%\bin\dnu publish <br />  "D:\home\site\repository\src\MyWebJob\project.json" <br />  --runtime %DNX_RUNTIME% <br />  --out "%DEPLOYMENT_TEMP%\wwwroot\App_Data\Jobs\Continuous\MyWebJob" <br />  %SCM_DNU_PUBLISH_OPTIONS%<br />IF !ERRORLEVEL! NEQ 0 goto error</pre></li></ol></ol></div><br /><h4>Check that it worked</h4><div>Push your changes and wait for Azure to deploy, then look at the webjobs in the Azure portal. You should see your job there. In case you don't, have a look at the publish log file to see if there are any errors in there.</div><div><br /></div>
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2016/03/29/auto-deploy-azure-web-job-with-aspnet-5.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

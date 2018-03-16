@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Using ASP.Net MVC without a MembershipProvider</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="Most people when they get to securing their ASP.Net MVC applications and managing users look to the MembershipProvider and the RoleProvider – or the new SimpleMembership. For many projects you then quickly realise that they don’t quite do what you want and you end up implementing your own versions of..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Using ASP.Net MVC without a MembershipProvider</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2013-03-18T22:22:00+00:00" itemprop="datePublished">
+          
+          Mar 18, 2013
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Security">Security</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    Most people when they get to securing their ASP.Net MVC applications and managing users look to the MembershipProvider and the RoleProvider – or the new SimpleMembership. For many projects you then quickly realise that they don’t <em>quite</em> do what you want and you end up implementing your own versions of the MembershipProvider and the RoleProvider. I have certainly done that myself.<br /><br />A big part of the reason is that, surely, lots of stuff in ASP.Net MVC is tied in to those standard providers and if you want to use nice things like the Authorize attribute then surely you need to use the Providers? As it turns out, this isn’t the case at all. There is a lot less black magic involved and I will claim that there is <em>less</em> work involved if you completely drop the providers compared to implementing your own versions of them. A lot of that has to do with the mental overhead involved in trying to figure out what is going on and figuring out which methods you need to implement.<br /><br />I strongly recommend reading through Brock Allen’s excellent <a href="http://brockallen.com/category/asp-net-security/" target="_blank">blog posts</a> on ASP.Net MVC security in which he also explains why the MembershipProvider and the RoleProvider are poor, leaky and heavyweight abstractions. <br /><br />Firstly, let’s just be clear: You don’t want to write your own logic for storing passwords and you don’t want to write your own logic for handling authentication cookies. ASP.Net MVC has got you covered – those bits are catered for by the framework without you having to use the providers at all.<br /><br />In this post I will demonstrate what actually happens when you use the providers in order to build the understanding and then I will show you a simple example of an app that&nbsp;doesn't&nbsp;use them at all. For this example I am using forms authentication throughout – you know, the one where you type your username and password into a box on a screen and you get a little authentication cookie. <br /><br />In summary, the MembershipProvider is intended as an&nbsp;abstraction&nbsp;for you to manage users and validate their passwords. It is not actually involved in the request processing <em>at all</em> – the Authorize atrribute will not call the MembershipProvider. In the Web Forms days, the MembershipProvider was quite handy because there were built-in controls that knew how to use the providers. But in MVC you have to write all that yourself anyway so the MembershipProvider really doesn’t give you a lot.<br /><br />The RoleProvider on the other hand <em>is</em> used in each request: It is asked to provide the list of roles for a user. Luckily, it is very easy to replace that functionality with your own code as we shall see.<br /><br />FormsAuthentication is the actual important workhorse. That is the one that is responsible for setting the authentication cookie securely, for reading and checking it on each incoming request, for setting HttpContext.Current.User, for managing sliding expiration and much more. <br /><br />If you want to follow along with a full code sample, it is all on GitHub at <a href="https://github.com/flytzen/NoMembershipProviderSample" title="https://github.com/flytzen/NoMembershipProviderSample">https://github.com/flytzen/NoMembershipProviderSample</a>.<br /><em><br /></em> <em>git clone https://github.com/flytzen/NoMembershipProviderSample</em><br /><em><br /></em> <br /><h2>Using FormsAuthentication to log in with no MembershipProvider and no RoleProvider</h2>In this first step, we will show how you can use Forms Authentication to log a user in and use the Authorize attribute without any providers at all. <br /><br /><em>git checkout step-1 </em>if you want to follow along.<br /><br />All you need to enable you to login is this in web.config:<br /><pre class="prettyprint">&lt;system.web&gt;<br />  &lt;authentication mode="Forms"&gt;<br />    &lt;forms loginUrl="~/Home/Login" /&gt;<br />  &lt;/authentication&gt;<br />  ....<br />&lt;/system.web&gt;</pre>This will enable FormsAuthentication and will make ASP.Net look out for a forms authentication cookie on all requests and populate HttpContext.Current.Principal with whatever the cookie says.<br /><br />You need some login logic as well. In our simplified example we don’t use a password so a controller action like this will set the authentication cookie:<br /><pre class="prettyprint">[HttpPost]<br />public ActionResult Login(string userName)<br />{<br />   FormsAuthentication.SetAuthCookie("flytzen", false);<br />   return RedirectToAction("Index");<br />}</pre><br />Of course, you want to do something much smarter than that, such as validating the user – we will get to that. As a side note, you will also be given a returnUrl parameter that you should use to return the user to the URL they were trying to access.<br /><br />Without anything else, you can now use the [Authorize] attribute and the [Authorize(Users = "username")] attribute. For some scenarios, this may be all you need. <br /><br />However, if you try to use [Authorize(Roles = "Administrator")] you will always be redirected to the login screen as you have not done anything to tell ASP.Net what roles this particular user has. For the shortcut on how to handle that, see <a href="http://brockallen.com/2012/05/23/think-twice-about-using-roleprovider/" title="http://brockallen.com/2012/05/23/think-twice-about-using-roleprovider/">http://brockallen.com/2012/05/23/think-twice-about-using-roleprovider/</a><br /><br /><h2>How much does ASP.Net really use MembershipProvider and RoleProvider?</h2>Before we carry on with building our example, let's take a little detour and explore how tightly coupled - or not - ASP.Net MVC is to the providers.<br /><br />One of the challenging things about handling users in ASP.Net MVC is that it is not at all clear how tightly coupled the MembershipProvider and the RoleProvider are into the framework. This means you don’t really know which methods you need to implemented – and it makes it hard to reason about whether to go down that pattern or just roll your own. We will test this out by implementing our own providers and see what is actually called.<br /><br />For the purposes of finding this out, we’ll create a MyMembershipProvider and a MyRoleProvider which inherits from the built-in MembershipProvider and RoleProvider and throws NotImplementedException on every single method.<br /><br /><em>git checkout step-2</em> if you are following along.<br /><br />We need to tell ASP.Net about by inserting the following in Web.config under &lt;system.web&gt;:<br /><pre class="prettyprint">&lt;membership defaultProvider="MyMembershipProvider"&gt;<br />  &lt;providers&gt;<br />    &lt;clear /&gt;<br />    &lt;add name="MyMembershipProvider" type="NoMembershipProviderSample.Providers.MyMembershipProvider" /&gt;<br />  &lt;/providers&gt;<br />&lt;/membership&gt;<br />&lt;roleManager enabled="true" defaultProvider="MyRoleProvider"&gt;<br />  &lt;providers&gt;<br />    &lt;clear /&gt;<br />    &lt;add name="MyRoleProvider" type="NoMembershipProviderSample.Providers.MyRoleProvider" /&gt;<br />  &lt;/providers&gt;<br />&lt;/roleManager&gt;</pre><br />As long as you are not logged in, your app continues to work. However, as soon as you have logged in, you will see that ASP.Net tries to call MyRoleProvider.GetRolesForUser. This happens on every request when you are logged in, irrespective of which URL you access – not only when you hit an action that has [Authorize(Roles=”xxx”)].<br /><br />The only thing you have to do to make everything work again is to change MyRoleProvider like this:<br /><pre class="prettyprint">public override string[] GetRolesForUser(string username)<br />{<br />    return new[] {"Administrator"};<br />}</pre><br /><em>git checkout step-3</em><br /><br />To look at this another way, apart from one single method on RoleProvider, everything that the MembershipProvider and the RoleProvider give you is a means to <em>manage</em> your users and roles and to verify a password on your login screen. This made a lot of sense in the days of Web Forms when you had standard controls that could talk to the Providers. But in MVC you are writing all that yourself anyway. So, I believe it is actually <em>less</em> work to just write the code you need and not bother with the whole provider thing. So that’s what we’ll do next.<br /><br /><h2>Implementing it yourself without using the providers</h2>In this first step we will enable you to create users and validate their passwords.<br /><br /><em>git checkout step-4</em><br /><br />Note that all of this code is rough sample code. For starters it should have error handling and it should certainly all be implemented with dependency injection etc. I am just trying to give you an idea of how simple this fundamentally is here, so forgive the messy code.<br /><br />Storing passwords is dangerous territory and unless you have a degree in cryptography is probably not something you want to do yourself. The good news is that MVC provides a helper method that will generate and validate properly salted password hashes for you. It’s called System.Web.Helpers.Crypto. For a super simple example, I have written the logic into an extension method as seen below. In the real world, you probably want to write a UserManager class and wrap Crypto in an interface so you can dependency inject it and have proper unit tests. Remember, this is just sample code.<br /><pre class="prettyprint">public static class AccountExtensions<br />{<br />     public static void SetPassword(this Account account, string password)<br />     {<br />         account.PasswordHash = Crypto.HashPassword(password);<br />      }<br /><br />    public static bool ValidatePassword(this Account account, string password)<br />    {<br />        return Crypto.VerifyHashedPassword(account.PasswordHash, password);<br />    }<br />}</pre><br />And that is really all there is to it. When I create a new user I just use the SetPassword method to generate a properly salted password. <br /><br />In the login method in the controller you can do something like this:<br /><pre class="prettyprint">[HttpPost]<br />public ActionResult Login(string userName, string password, string returnUrl)<br />{<br />   var repo = new AccountRepository();<br />   var user = repo.FindByName(userName);<br />   if (user != null &amp;&amp; user.ValidatePassword(password))<br />   {<br />      FormsAuthentication.SetAuthCookie(userName, false);<br />      if (returnUrl != null &amp;&amp; Url.IsLocalUrl(returnUrl))<br />         return Redirect(returnUrl);<br />      else<br />         return RedirectToAction("Index");<br />    }<br />    ModelState.AddModelError("", "Invalid user name or password");<br />    return View();<br />}</pre><br />Again, it’s ugly sample code. You would of course want to DI the repository etc. In fact, you would probably want to have a User Manager that could retrieve the user and validate the password etc. But you get the idea.<br /><br />The important thing here is that the two <em>dangerous</em> things, namely storing and validation of passwords and the setting and checking of login-cookies is all handled by ASP.Net for you so you can rely on that team knowing what they are doing. You are only doing the simple and safe things yourself.<br /><br /><h2>So what about roles then?</h2><em>git checkout step-4</em><br /><br />This bit is lifted almost ad verbatim from <a href="http://brockallen.com/2012/05/23/think-twice-about-using-roleprovider/" target="_blank">Brock Allen</a>.<br /><br />In global.asax.cs insert this code:<br /><pre class="prettyprint">void Application_PostAuthenticateRequest(object sender, EventArgs e)<br />{<br />   var ctx = HttpContext.Current;<br />   if (ctx.Request.IsAuthenticated)<br />   {<br />      string[] roles = LookupRolesForUser(ctx.User.Identity.Name);<br />      var newUser = new GenericPrincipal(ctx.User.Identity, roles);<br />      ctx.User = Thread.CurrentPrincipal = newUser;<br />   }<br />}<br /><br />private string[] LookupRolesForUser(string name)<br />{<br />    var repo = new AccountRepository(); // In the real world, you would probably use service locator pattern and call DependencyResolver here<br />    var user = repo.FindByName(name);<br />    if (user != null)<br />    {<br />       return user.Roles;<br />    }<br /><br />    return new string[0];  // Alternatively throw an exception<br />}</pre><br />Note that it may seem wasteful to go and find the roles on each request irrespecitive of whether the Authorize attribute asks for it. That is how the standard RoleProvider implementation works so you are no worse off, at least. But now that you have more control, you could quite easily implement a CurrentUserProvider which has caching so you can save database calls on each request.<br /><br />Alternatively, if you don’t want to mess around with global.asax in this way, you could implement a custom RoleProvider and just implement GetRolesForUser if you really wanted.<br /><br />And there you have it – it really is that simple to not use the Provider model for your users in MVC. Of course, you have to implement things like locking out users, reset password and so on. But as soon as you inherit from the base MembershipProvider you have to provide your own implementation of all those things anyway. And this way you are not bound by the constraints built into the abstraction.
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2013/03/18/using-aspnet-mvc-without.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

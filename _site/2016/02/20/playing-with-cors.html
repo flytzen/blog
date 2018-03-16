@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Playing with CORS</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="I recently had reason to get to understand CORS in a bit more detail and I wanted to share what I learned. I did this with ASP.Net 5 / MVC6 but the principles apply more broadly.This post is not&nbsp;about how to set up the built-in CORS middleware, but rather about..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Playing with CORS</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2016-02-20T21:41:00+00:00" itemprop="datePublished">
+          
+          Feb 20, 2016
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Web">Web</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    I recently had reason to get to understand CORS in a bit more detail and I wanted to share what I learned. I did this with ASP.Net 5 / MVC6 but the principles apply more broadly.<br />This post is <i>not</i>&nbsp;about how to set up the built-in CORS middleware, but rather about how to handle it yourself when you want and need to. Also, I am deliberately simplifying to make this just an introduction.<br />If you just want to get CORS handled by default, Microsoft has <a href="http://docs.asp.net/en/latest/security/cors.html">a great article on how to do this in ASP.Net 5 / MVC 6</a>.<br /><br /><h3>The biggest lesson</h3>The biggest lesson learned for me was that CORS does not (always) stop cross-origin requests from being sent to <i>and processed</i>&nbsp;on my server. It <i>does</i>&nbsp;stop the browser from giving the result back to the calling javascript.<br />What this means is that if you have a controller action in your ASP.Net application (and presumably the same in other frameworks) then it is entirely possible for javascript on a different site to call that API method and the code on your server <i>will</i>&nbsp;execute - it's just that the result will never get back to the calling javascript . Most of the time this is fine, assuming you are securing your controllers appropriately - but it is different from what I expected.<br /><br /><h3>Broad-brush CORS</h3>CORS is a security mechanism implemented in modern web browsers. In it's simplest terms, if you load a page from domain A and there is some javascript on that page which tries to get or post data to domain B then the browser will (usually) send that request over to domain B, but when it gets a response it will look for a set of headers that specify which domains are allowed to call services on domain B (along with some other restrictions). Note that the server will, by default, happily have processed the request and will have sent the result back - but the browser will check the headers that came back to see if the rules have been met and, if not, will discard the result and not give it back to the calling javascript.<br /><br />There is an important variation to this. Under certain circumstances, the browser will do a "preflight check" before it does the actual request. What this means is that the browser will send a request to domain B with a method OPTIONS (instead of GET or POST or whatever), in which it basically says to the server on domain B "hi, I'm just about to send you a request that looks like this. Can you just tell me which CORS headers you'd return if I did that?". If configured correctly, the server on domain B will respond with the appropriate headers and the browser will determine if it should send the actual request - or not.<br />There are a range of scenarios in which this preflight check will take place, usually if custom headers are involved or you try to send content other than plain text or form encoded (such as JSON or XML). But, it is important to understand a few things;<br /><br /><ol><li>There are scenarios where the preflight check will not take place so you cannot rely on the preflight check to keep you safe. In those cases, your controller will be called with the full payload and will execute normally - <i>even if you install the CORS middleware</i>.</li><li>CORS only really applies to requests from browsers so it doesn't, in any case, help against people who are attacking you directly.</li><li>&nbsp;If you do not have CORS middleware configured, preflight checks are passed to your controller actions. See below.</li></ol><div><br /></div><h3>Pre-flight checks without CORS middleware installed</h3>Let's say you have a simple API method like this;<br /><pre class="prettyprint">[Route("blah")]<br />[HttpPost]<br />public IActionResult Post(Model data)<br />{<br />    //Do stuff<br />}        <br /></pre>Now imagine a preflight check comes in. It will have a method of OPTIONS so you may assume it won't hit your controller - I mean you got that nice HttpPost attribute there, right? But part of the preflight check information is that it <i>wants</i>&nbsp;to do a POST, so the call will be passed to your controller - except without any body. So, if you are not using CORS middleware you may want to explicitly handle that situation like so;<br /><br /><pre class="prettyprint">[Route("blah")]<br />[HttpPost]<br />public IActionResult Post(Model data)<br />{<br />    if (this.Request.Method == "OPTIONS")<br />    {<br />       return this.Ok(); // Well, probably not what you want to do, but you get the idea<br />    }<br />}        <br /></pre><br />In conclusion, even if you don't expect to have to support CORS, <a href="http://docs.asp.net/en/latest/security/cors.html">install the middleware</a> and have one less thing to worry about.<br /><br /><h3>Manually handling CORS</h3><div>I have a scenario where I want to manually handle CORS. At <a href="http://www.neworbit.co.uk/">NewOrbit</a> we do a number of static marketing sites for people to help market the apps we build for them. Usually they need to have a contact form which means we build a quick bit of server-side code to do that - for each site.&nbsp;<a href="http://formspree.io/">http://formspree.io/</a>&nbsp;was pointed out to us as a way to make it more simple - and a very nice solution it is. But I was curious about whether we could build something like that ourself, just for fun. Formspree allows you to do just do a FORM POST, which doesn't involve Origin headers (well, Chrome sends it but Firefox doesn't) I wanted to be able to control which sites were able to send emails via the service, which I can do by handling CORS myself, directly in my controller. This does mean the clients can't just do a FORM POST, they'll have to use javascript though.<br />Some benefits of this include;</div><div><ul><li>I can dynamically add new sites that are allowed.</li><li>When responding to requests, I can just return the one site that is actually asking, rather than a list of all the allowed sites.</li></ul><div>My implementation looks something like this;</div></div><pre class="prettyprint">public IActionResult Post([FromBody]dynamic data)<br />{<br />    var originHeader = this.GetOriginHeader();<br />    if (!this.IsValidOrigin(originHeader))<br />       return new ContentResult() { StatusCode = 403, Content = "Invalid origin" };<br />    }<br /><br />    this.AddCORSHeaders(originHeader);<br />    if (this.Request.Method == "OPTIONS")<br />    {<br />        return this.Ok();<br />    }<br /><br />    // Chrome sets the Origin header on a cross-domain post. Sadly, Firefox doesn't, so I can't allow plain form posts.<br />    return new ContentResult() { StatusCode = 200, Content = this.Request.Method };<br />}<br /><br />private void AddCORSHeaders(string originHeader)<br />{<br />    this.Response.Headers.Add("Access-Control-Allow-Origin", originHeader);<br />    this.Response.Headers.Add("Access-Control-Allow-Methods", "POST");<br />    this.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");<br />}<br /><br />private string GetOriginHeader()<br />{<br />    var originHeaders = this.Request.Headers["Origin"];<br />    if (originHeaders.Count != 1)<br />    {<br />       return null;<br />    }<br />    return originHeaders[0];<br />}<br /><br />private bool IsValidOrigin(string origin)<br />{<br />    if (String.IsNullOrEmpty(origin))<br />    {<br />       return false;<br />    }<br />    return origin == "http://localhost:5001";<br />}<br /></pre>
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2016/02/20/playing-with-cors.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

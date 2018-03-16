@@ -8,4 +8,5 @@
   {% if jekyll.environment == 'production' and site.google_analytics %}
     {% include google-analytics.html %}
   {% endif %}
+  <meta name="description" content="{{ page.excerpt | strip_html | truncatewords: 50 }}" />
 </head>

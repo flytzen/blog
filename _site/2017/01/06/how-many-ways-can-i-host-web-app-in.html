@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - How many ways can I host a web app in Azure?</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="I got talking to a colleague about how many ways there are to host web apps in Azure and even managed to surprise myself by just how many ways I could think of. It inspired me to compile this list, which is just off the top of my head. I'm..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How many ways can I host a web app in Azure?</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2017-01-06T20:17:00+00:00" itemprop="datePublished">
+          
+          Jan 6, 2017
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Azure">Azure</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    I got talking to a colleague about how many ways there are to host web apps in Azure and even managed to surprise myself by just how many ways I could think of. It inspired me to compile this list, which is just off the top of my head. I'm sure there are more - if you can think of other ways, please leave a comment.<br /><br />For the purposes of this, I am defining a web app as something that has a user-facing UI <i>and </i>some server-side functionality. I have listed a few additional options at the bottom if you only need one of those things.<br /><br />I put this list together real quick like and the description of each service is just a very quick summary, mainly just from memory so please do not view this as a definitive or highly accurate document; It's mainly just a fun exercise. That said, do please point out any factual errors in the comments so I can correct them.<br /><br /><h3><a href="https://azure.microsoft.com/en-gb/services/app-service/web/">Web Apps</a></h3><div>This is the default option and probably what you should choose if in doubt. It's getting a lot of love from Microsoft at the moment and is constantly getting new features. You get fail-over and auto-scaling by default, plans from free to expensive and it is available in both Windows and Linux flavours (in preview). It's very easy to get started with and supports pretty much anything from static pages to complex deployment processes, staging slots and even a built-in basic CD pipeline.<br />The main thing to be aware of is that you don't get admin access to the server, so if you need to, say, customise which SSL protocols are available or you need to install fonts, you are out of luck. From experience, it is very rare that you need this, though.&nbsp;</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/cloud-services/">Cloud Services</a></h3><div>This is the original Platform-as-a-Service option in Azure. It doesn't get much love these days, but I am still fond of it for those few situations where I need more than Web Apps can give me. Essentially, you provide Azure with an application package and Azure will take care of deploying that to one or more servers for you. You do get full admin access to the servers so you can do what you like - as long as you script it as part of your package. Patching, fail-over, load-balancing, auto-scaling, health monitoring etc is all taken care of for you.</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/functions/">Functions</a></h3><div>This isn't really meant for doing a proper web app, but you <i>can </i>write a collection of functions that acts as an API or return some HTML etc, so you could certainly do it if you really wanted. Understand me right, though, Functions are brilliant for what they are meant to do, even if building whole web apps isn't it. That said, if you just need a couple of simple APIs to support a front-end app then it is certainly something you should consider.</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/service-fabric/">Service Fabric</a></h3><div>Not very well known, but Azure provides a pretty advanced micro-services framework that you can use for building sophisticated, large-scale applications. It supports both a service model and a basic Actor model out of the box. It's got a pretty high base cost relative to other Azure services due to the minimum number of nodes you have to use, but if you have a need for lots of scale then you should definitely look at this. Azure uses it to power a lot of their own architecture, including both SQL Azure and DocumentDb.&nbsp;</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/virtual-machines/">Virtual Machine</a></h3><div>You can, of course, deploy good old-fashined virtual machines and run your web app on them. You are then responsible for patching and some level of maintenance yourself. You can define images so Azure can do auto scaling for you as well. I personally try to avoid using VMs as far as I can as I don't like to be responsible for patching and maintenance etc - yet, I still have about 40 of them :).</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/container-service/">Container Services / Docker</a></h3><div>If you are one of those cool kids who like Docker, you are in luck. Azure has native support for Docker and support DC/OS, Docker Swarm and Kubernetes out of the box.</div><div><br /></div><div><br /></div><div>So, how many was that? Six, I think, though I probably shouldn't count the Functions one :)</div><div><br /></div><h4>Related</h4><div>As if all the above wasn't enough, there are a couple of other technologies that can also be used to deal with web sites or APIs.</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/storage/blobs/">Blob Storage</a> / <a href="https://azure.microsoft.com/en-gb/services/cdn/">CDN</a></h3><div>Blob storage is Azure's file storage system (okay, it's more than that, but let that suffice for now). You can share a container publicly and put html, js, css and whatever other files you like in it. I quite often use it for static assets, though in theory you could host a whole website in there. Azure CDN <i>can</i> sit on top of blob storage and gives you geo-replication of the files. You can map custom domains to blob storage as well. Of course, this is all static so I couldn't quite include it in my list above.&nbsp;</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/traffic-manager/">Traffic Manager</a></h3><div>Traffic Manager doesn't host anything, but it is worth understanding where it fits in. Pretty much all of the above options include a load balancer (automatic, you don't really have to worry about it) and fail-over within a data centre. If you need fail-over between data centres or want to route traffic to servers close to your users, you can use Traffic Manager. It works at the DNS level and is used to direct user requests for a given domain name to the nearest available data centre.&nbsp;</div><div><br /></div><h3><a href="https://azure.microsoft.com/en-gb/services/api-management/">API Management</a></h3><div>Not strongly related to web app hosting, but I just thought I'd mention it; Basically, if you develop an API and you want to give external users access to it you probably want to do things like controlling who can use it (maybe so you can bill them), rate limiting, authentication and so on. Azure API management deals with all that as a service that just sits in front of your naked API so you don't have to write it all yourself.</div><div><br /></div><h4>Takeaway</h4><div>When I started this list, I really didn't expect it would be this long. I think it's great there is so much choice and I know that each option has it's own set of strengths and weaknesses. We use most of the technologies listed here on different projects and for different reasons, and I'm very happy that I can choose. At the same time, I think it is probably quite tough for someone new to Azure to even get started on figuring out which of the many options are right for their particular scenario. And I have only dealt with web app hosting here, not the multitude of other things you can do.</div><div><br /></div><div>I just meant for this post to be a fun little exercise but, having written it, I should mention that at <a href="http://www.neworbit.co.uk/">NewOrbit</a> we have recently started helping other companies move to the cloud and sharing our years of Azure experience with them.&nbsp;</div><div><br /></div><div>If you have any questions or want to talk more, <a href="https://twitter.com/flytzen">ping me on twitter</a>&nbsp;or add a comment below.</div>
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2017/01/06/how-many-ways-can-i-host-web-app-in.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

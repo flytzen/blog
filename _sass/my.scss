@@ -6,16 +6,18 @@ div.homeboxes {
   @media all and (max-width: $break-small) {
     flex-direction: column;
   }
-}
-
-div.homeblogbox {
-  margin: 0.5em;
-  padding: 0.5em;
-  border: silver solid 1px;
-  flex: 3;
   h2 {
     text-align: center;
   }
+}
+
+div.homeblogbox {
+  margin: 0.1em 0.3em 0.4em 0;
+  padding: 0.5em;
+  border: silver solid 1px;
+  border-radius: 10px;
+  flex: 3;
+
   ul.post-list {
     h3 {
       margin: 0;
@@ -31,17 +33,16 @@ div.homeblogbox {
 }
 
 div.homesidebar {
-  margin: 0.5em;
-  padding: 0.5em;
-  border: silver solid 1px;
+  margin: 0.1em 0 0 0.3em;
   flex: 1;
   display: flex;
   flex-direction: column;
 
   div {
-    padding: 0.1em;
-    margin-bottom: 0.1em;
+    padding: 0.5em;
+    margin-bottom: 0.4em;
     border: silver solid 1px;
+    border-radius: 10px;
   }
 }
 

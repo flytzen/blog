@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - Moving TS Profiles and Home Drives to another server</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="I recently found myself in the situation of having to move the Terminal Server user profiles and the Home Drives directory from one server to another. There are similar challenges involved to moving Roaming Profiles, because you do not have access rights to the user’s profile directory, so you can’t..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Moving TS Profiles and Home Drives to another server</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2010-03-07T21:45:00+00:00" itemprop="datePublished">
+          
+          Mar 7, 2010
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#Technology">Technology</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I recently found myself in the situation of having to move the Terminal Server user profiles and the Home Drives directory from one server to another. There are similar challenges involved to moving Roaming Profiles, because you do not have access rights to the user’s profile directory, so you can’t just copy the data.</p>  <p>In short, you need to use </p>  <blockquote>   <p>robocopy /e /b /copyall </p> </blockquote>  <p>to copy the folder from one server to another.    <br />After the files are copied, you should be able to just update the Terminal Server Group Policy with the new locations.</p>  <p>But, let me take you through the hoops I had to go through, just in case you have some of the same issues.</p>  <p>The TSProfiles and HomeDrives resided on a Windows Server 2008 server (AD1) and I wanted to move them to a Windows Server 2003 Server (FS1). </p>  <p>Robocopy is included in Windows Server 2008 so I decided to try to do the copy from the 2008 server like this;</p>  <blockquote>   <p>robocopy /e /b /copyall d:\TSProfiles <a href="file://\\fs1\d$\TSProfiles">\\fs1\d$\TSProfiles</a>.</p> </blockquote>  <p>This failed with an error:</p>  <blockquote>   <p>ERROR: You do not have the Backup and Restore Files user rights.     <br />***** You need these to perform backup copies (/B or /ZB)</p> </blockquote>  <p>Hmmm. Okay, add myself to the Backup Operators group – same problem. Turns out it was our old friend, the UAC. So, run the Command Prompt “As Administrator” and all is fine with robocopy.</p>  <p>Well, sort of – some of the files copied correctly while others gave an error:</p>  <blockquote>   <p>ERROR 5 (0x00000005) Copying NTFS Security to Destination Directory xxx     <br />Access us denied.</p> </blockquote>  <p>Now, the files had copied but they didn’t have the correct security, so start again.   <br />A little look on the Internet revealed that there are sometimes problems with Robocopy when copying <em>to</em> another server. So, go to FS1 and copy <em>from </em>there instead. Now, this meant I first had to install Robocopy as it is a 2003 server. Robocopy is part of the <a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=9D467A69-57FF-4AE7-96EE-B18C4790CFFD&amp;displaylang=en">Windows Server 2003 Resource Kit</a>.    <br />Once that was done I ran</p>  <blockquote>   <p>robocopy /b /e /copyall <a href="file://\\ad1\d$\TSProfiles">\\ad1\d$\TSProfiles</a> d:\TSProfiles</p> </blockquote>  <p>and all was well. </p>  <p>Finally, all I had to do was change the Group Policy for&#160; the Terminal Servers to point to the new locations for the Homedrives and the Profiles and log in to each Terminal Server in turn and do a GPUPDATE /FORCE.   <br />In my case, the homedrives and profiles are specified in the Terminal Server Computer policy, <em>not</em> in the user policy applied to the users. More specifically in:</p>  <blockquote>   <p>Computer Configuration/Administrative Templates/Windows Components/Terminal Services/Terminal Server/Profiles</p> </blockquote>  <p>This did work seamlessly, to my surprise, and I would expect that with normal roaming profiles you may have more fun…</p>  
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2010/03/07/moving-ts-profiles-and-home-drives-to.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

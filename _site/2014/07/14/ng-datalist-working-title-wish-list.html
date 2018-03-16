@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <title>Frans' Randomness - ng-dataList (working title) wish list</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/assets/main.css">
+  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  
+  <meta name="description" content="This post is primarily a set of notes to myself on what I would like to see in a new “data list” angular component. It’s here on my blog for easy sharing. Background At NewOrbit we build a range of web-based applications for our clients and partners. Mostly they have..." />
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+  <div class="wrapper">
+    
+    
+    <a class="site-title" rel="author" href="/">Frans&#39; Randomness</a>
+    
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+              <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+              <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger">
+          <a class="page-link" href="/talks">Talks</a>
+          <a class="page-link" href="/blog">Blog</a>
+        </div>
+      </nav>
+    
+  </div>
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">ng-dataList (working title) wish list</h1>
+    <div class="post-meta">
+      <div class="authorandtime">
+        <time class="dt-published" datetime="2014-07-14T17:12:00+01:00" itemprop="datePublished">
+          
+          Jul 14, 2014
+        </time>
+        
+          • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span class="p-author h-card" itemprop="name">Frans Lytzen</span></span>
+        
+      </div>
+      <div class="post-tags">
+        
+        <a href="/tags/#JavaScript">JavaScript</a>
+        
+        
+      </div>
+    </div>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>This post is primarily a set of notes to myself on what I would like to see in a new “data list” angular component. It’s here on my blog for easy sharing. </p> <h2>Background</h2> <p>At <a href="http://www.neworbit.co.uk">NewOrbit</a> we build a range of web-based applications for our clients and partners. Mostly they have a lot of data in them and, inevitably, a significant portion of the user interface revolves around listing and interacting with data.</p> <p>We have used a number of approaches to listing data over the years including <a href="http://jqgrid.com/">jqGrid</a> and <a href="https://github.com/angular-ui/ng-grid">ng-grid</a>, both of which have a lot of very useful features and we have been happy to use them. The main issue really is around responsive design and mobile devices. I have some thoughts on a slightly different approach that may be feasible. The end-goal for us would be to either contribute to an existing OSS project <em>for Angularjs</em> or build a new project. Truth be told, ng-grid has most of the building blocks we need and the ideal would be to work with that team to enhance ng-grid, if it fits with that team’s vision.</p> <p>All the most recent work I have done has been with ng-grid so I will focus on comparing and contrasting with ng-grid in this post. I think ng-grid has some really clever core features, including some nice functionality around limiting how many entries are actually created in the DOM (or so I believe).</p> <h2>Responsive design</h2> <p><a href="http://lh5.ggpht.com/-WLuuoX3mtas/U8QBYQbPxNI/AAAAAAAAARw/uMRv9vwSYow/s1600-h/image%25255B2%25255D.png"><img title="image" style="border-left-width: 0px; border-right-width: 0px; background-image: none; border-bottom-width: 0px; float: right; padding-top: 0px; padding-left: 0px; display: inline; padding-right: 0px; border-top-width: 0px" border="0" alt="image" src="http://lh4.ggpht.com/-En303kdgTYc/U8QBZEUviDI/AAAAAAAAAR4/4JhYAU9zFMA/image_thumb.png?imgmax=800" width="184" align="right" height="234"></a>There is a good discussion on responsive design for ng-grid <a href="https://github.com/angular-ui/ng-grid/issues/461">here</a>. To be honest, it comes down to the word “grid” and the fact that, well, making a grid responsive in a sensible way is <em>hard </em>(if not actually impossible). I have called this post “ng-dataList” for a reason, in that I want to think about a component to <em>list</em> data in a variety of formats, including (probably) grids. The idea, broadly, is to build the infrastructure component that understands things like interacting with data sources (see below), caching templates, figuring out which DOM entries to create and so on. It should come with some default Presentation options but with the user able to completely change them as they see fit.</p> <p>But I am getting ahead of myself here. </p> <p>There are a number of articles out there emphasising that responsive design isn’t just about reformatting the same data for different form factors, it’s about trying to understand what the user wants to do when using different devices and adapt accordingly. For example, if you are looking at a flight booking site, chances are that on your mobile you are browsing and “getting a feel” whereas you are more likely to do the actual booking when sat at your computer. This means that you want to think differently about what information you show to the user in the list of possible flights, depending on the device they are using. There was a very good article covering this that I can’t currently find.</p> <p>The other aspect is the increasing importance of “cards”. <a href="https://medium.com/@intercom/why-cards-are-the-future-of-the-web-d3f6ce8b843a">This article</a> explains it better than I ever could. Suffice to say, the ability to show a list of data as <em>cards</em>, either all underneath each other or even with multiple cards per row is an extremely useful thing – for large screens as well. </p> <p>Yes, you can build “card lists” like this yourself, and indeed we have done so. But you still need to think very carefully about pagination and DOM manipulation if your backing data store has thousands of data items. Hence, having a reusable component that handles all of that plumbing and simply hands over a set of objects to a template provided by the end-developer seems like a useful thing.</p> <p><u><strong>Searching</strong></u></p> <p>An interesting thing to consider if you show data as cards is searching/filtering and sorting. With a grid it’s quite easy; people <em>know</em> that they can click on column-headers to sort and they know that if there is an input box underneath the column heading then they can type something in there to filter. That’s all of a sudden a lot harder if you are showing a list of cards. One option may be to re-invent the ancient practice of “query-by-form”; You could potentially show a card at the top of the list and allow the user to type search data into it and to click on fields and/or labels to sort. In any case, it will require more UI thought than what you can get away with in a grid.</p> <h2>Data sources</h2> <p>jgGrid is designed to work with remote data sources and give you a bunch of hooks to provide functions for to get data in to the grid. ng-grid natively expects you to have all the data locally in an array but provide you with a number of hooks you can override in order to support server-side pagination, sorting and filtering. I have successfully written a directive that allows me to relatively easily use ng-grid with an oData backend, so the model works. However, it is too hard to write such directives; there are too many things you have to override and too many little tweaks you need to put in.</p> <p>What I would prefer is the concept of a “data source” which is a separate javascript function (or object instance) which can be passed information about pagination, filtering and sorting in a standard way and will then be responsible for returning the appropriate set of data to the “infrastructure” component – of course, via a promise or a callback. </p> <p>That way, rather than pointing the “dataList-options” at an array, you would say something like </p><pre>data: new inMemorySource($scope.data)</pre><br /><p>or</p><pre>data: new oDataSource(url)</pre><br /><p>etc…</p><br /><p>The thinking is to completely remove the core data handling from the core library and just use plugins. This would make it super easy to wire in different data providers.</p>  
+  </div>
+
+  
+    
+
+  
+
+  <a class="u-url" href="/2014/07/14/ng-datalist-working-title-wish-list.html" hidden></a>
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Frans&#39; Randomness</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">
+            Frans Lytzen
+            </li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+  
+  
+  
+  <li><a href="https://github.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.linkedin.com/in/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  <li><a href="https://www.twitter.com/flytzen"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">flytzen</span></a></li>
+  
+  
+  
+</ul>
+
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>My very infrequent thoughts on the world of software development</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
