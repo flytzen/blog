@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/assets/main.css">
-  <link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Frans' Randomness" />
+  <link type="application/atom+xml" rel="alternate" href="https://www.lytzen.name/feed.xml" title="Frans' Randomness" />
   
   <meta name="description" content="It took me a while to figure out how to Mock RestSharp’s ExecuteAsync method for unit testing purposes. Once you realise that ExecuteAsync takes a callback which is called when the REST call completes it all becomes reasonably straightforward, using Mocks Callback function;Mock&lt;IRestClient&gt; restClient = new Mock&lt;IRestClient&gt;(); restClient.Setup(c =&gt; c.ExecuteAsync&lt;MyResult&gt;(..." />
 </head>
@@ -74,12 +74,11 @@
 
   
     
-
   <div id="disqus_thread"></div>
   <script>
     var disqus_config = function () {
-      this.page.url = 'http://localhost:4000/2013/01/10/how-to-mock-restsharpexecuteasync.html';
-      this.page.identifier = 'http://localhost:4000/2013/01/10/how-to-mock-restsharpexecuteasync.html';
+      this.page.url = 'https://www.lytzen.name/2013/01/10/how-to-mock-restsharpexecuteasync.html';
+      this.page.identifier = '/2013/01/10/how-to-mock-restsharpexecuteasync.html';
     };
 
     (function() {

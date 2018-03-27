@@ -17,7 +17,7 @@ title: Frans' Randomness
 description: >- # this means to ignore newlines until "baseurl:"
   My very infrequent thoughts on the world of software development
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://www.lytzen.name" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: flytzen
 github_username:  flytzen
 linkedin_username: flytzen
