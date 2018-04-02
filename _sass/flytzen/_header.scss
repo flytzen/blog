@@ -1,0 +1,20 @@
+.header {
+  background: pink;
+  padding: $spacing * 2 0;
+
+  .wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: 3.2rem;
+    font-weight: 300;
+  }
+
+  &__nav {
+    text-transform: uppercase;
+  }
+
+}

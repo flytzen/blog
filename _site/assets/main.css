@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,700");
 textarea,
 input,
 select {
@@ -10,14 +11,6 @@ a,
 a:hover,
 a:focus {
   text-decoration: none; }
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin: 0; }
 
 ul {
   padding: 0;
@@ -377,7 +370,7 @@ textarea {
  */
 .highlight {
   background: #fff;
-  margin-bottom: 15px; }
+  margin-bottom: 3.2rem; }
   .highlighter-rouge .highlight {
     background: #eef; }
   .highlight .c {
@@ -513,3 +506,91 @@ textarea {
     color: #008080; }
   .highlight .il {
     color: #099; }
+
+.header {
+  background: pink;
+  padding: 1.6rem 0; }
+  .header .wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
+  .header__title {
+    font-size: 3.2rem;
+    font-weight: 300; }
+  .header__nav {
+    text-transform: uppercase; }
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  width: 100%; }
+
+html {
+  font-size: 62.5%; }
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background: #fdfdfd;
+  color: #111;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; }
+
+h1,
+h2,
+h3,
+h4,
+hr,
+blockquote,
+p,
+ul,
+ol,
+pre {
+  margin-top: 2.4rem;
+  margin-bottom: 2.4rem; }
+
+h1,
+h2,
+h3,
+h4,
+hr {
+  font-weight: 300;
+  line-height: 1em; }
+
+h1 {
+  font-size: 4.8rem; }
+
+h2, .h2 {
+  font-size: 3.6rem; }
+
+h3, .h3, h4, .h4 {
+  font-weight: 700; }
+
+h3, .h3 {
+  font-size: 2.4rem; }
+
+h4, .h4 {
+  font-size: 1.8rem; }
+
+pre {
+  font-size: 1.2rem; }
+
+.page-content {
+  line-height: 1.5; }
+  .page-content a {
+    color: red; }
+
+.link-txt {
+  font-size: 1rem;
+  font-weight: 700; }
+
+.wrapper {
+  width: 100%;
+  max-width: 80rem;
+  padding: 0 0.8rem;
+  margin: 0 auto; }

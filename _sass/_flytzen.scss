@@ -1,51 +1,120 @@
 @charset "utf-8";
 
 // Define defaults for each variable.
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+$base-font-family:      'Roboto', sans-serif !default;
+$base-font-size:        1.6rem !default;
+$base-font-weight:      400 !default;
+$base-line-height:      1.5 !default;
+$base-text-color:       #111 !default;
 
-$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
-$base-font-size:   16px !default;
-$base-font-weight: 400 !default;
-$small-font-size:  $base-font-size * 0.875 !default;
-$base-line-height: 1.5 !default;
+$spacing:          0.8rem !default;
 
-$spacing-unit:     30px !default;
-
-$text-color:       #111 !default;
-$background-color: #fdfdfd !default;
-$brand-color:      #2a7ae2 !default;
-
-$grey-color:       #828282 !default;
-$grey-color-light: lighten($grey-color, 40%) !default;
-$grey-color-dark:  darken($grey-color, 25%) !default;
-
-$table-text-align: left !default;
+$base-background-color: #fdfdfd !default;
 
 // Width of the content area
-$content-width:    800px !default;
-
-$on-palm:          600px !default;
-$on-laptop:        800px !default;
-
-// Use media queries like this:
-// @include media-query($on-palm) {
-//   .wrapper {
-//     padding-right: $spacing-unit / 2;
-//     padding-left: $spacing-unit / 2;
-//   }
-// }
-@mixin media-query($device) {
-  @media screen and (max-width: $device) {
-    @content;
-  }
-}
-
-@mixin relative-font-size($ratio) {
-  font-size: $base-font-size * $ratio;
-}
+$content-width:    80rem !default;
 
 // Import partials.
 @import
   "flytzen/resets-helpers",
   "flytzen/normalise",
-  "flytzen/syntax-highlighting"
+  "flytzen/syntax-highlighting",
+  "flytzen/header"
 ;
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	position: relative;
+	width: 100%;
+}
+
+html {
+	font-size: 62.5%; // Makes rem values realatable to px (eg 1.6 rem = 16px)
+}
+
+body {
+	font-family: $base-font-family;
+  font-size: $base-font-size;
+	font-weight: $base-font-weight;
+	line-height: $base-line-height;
+	background: $base-background-color;
+	color: $base-text-color;
+	text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+
+}
+
+h1,
+h2,
+h3,
+h4,
+hr,
+blockquote,
+p,
+ul,
+ol,
+pre {
+	margin-top: 2.4rem;
+	margin-bottom: 2.4rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+hr {
+	font-weight: 300;
+	line-height: 1em;
+}
+
+h1 {
+	font-size: 4.8rem;
+}
+
+h2, .h2 {
+	font-size: 3.6rem;
+}
+
+h3, .h3, h4, .h4 {
+  font-weight: 700;
+}
+
+h3, .h3 {
+	font-size: 2.4rem;
+}
+
+h4, .h4 {
+	font-size: 1.8rem;
+}
+
+pre {
+	font-size: 1.2rem;
+}
+
+.page-content {
+	line-height: $base-line-height;
+
+	a {
+		color: red;
+	}
+
+}
+
+.link-txt {
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+.wrapper {
+	width: 100%;
+	max-width: $content-width;
+	padding: 0 $spacing;
+	margin: 0 auto;
+}

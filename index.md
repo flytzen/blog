@@ -1,17 +1,25 @@
 ---
 layout: default
 ---
-<h1 class="page-heading">Welcome to my randomness</h1>
-<p>
+# Welcome to my randomness
+
 Hi, I'm Frans.
-I love technology and I enjoy <a href="/blog/">writing</a> and <a href="/talks/">speaking</a> about security, .Net, Azure and GDPR - not necessarily in that order. <br>
-When not doing that, I design and build systems at <a href="https://neworbit.co.uk">NewOrbit</a>.<br>
-My next talk will be on <a href="https://www.meetup.com/dotnetoxford/events/247607774/">how to secure your web apps in Azure at .Net Oxford on 24 April</a>
-</p>
+
+I love technology and I enjoy <a href="/blog/">writing</a> and <a href="/talks/">speaking</a> about security, .Net, Azure and GDPR - not necessarily in that order.
+When not doing that, I design and build systems at <a href="https://neworbit.co.uk">NewOrbit</a>.
+
+***
+
+## My next talk:
+
+<a href="https://www.meetup.com/dotnetoxford/events/247607774/">how to secure your web apps in Azure at .Net Oxford on 24 April</a>
+
+***
+
+## Recent Blog Posts
 
 <div class="homeboxes">
     <div class="homeblogbox">
-        <h2><a href="/blog/">Blog</a></h2>
             <ul class="post-list">
                 {% for post in site.posts limit:4 %}
                 <li>
@@ -23,6 +31,7 @@ My next talk will be on <a href="https://www.meetup.com/dotnetoxford/events/2476
                     <div class="excerpt">
                         {{ post.excerpt | strip_html | truncatewords: 30 }}
                     </div>
+                    <hr />
                 </li>
                 {% endfor %}
             </ul>
@@ -35,10 +44,9 @@ My next talk will be on <a href="https://www.meetup.com/dotnetoxford/events/2476
             <h3><a href="https://www.meetup.com/dotnetoxford/events/247607774/">How to secure your web app in Azure</a></h3>
             <small>April 24, .Net Oxford</small>
         </div>
-        <div>
+        <!-- <div>
             <a class="twitter-timeline" href="https://twitter.com/flytzen" data-height="300">Tweets by @flytzen</a>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
-        </div>
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div> -->
     </div>
 </div>
-
