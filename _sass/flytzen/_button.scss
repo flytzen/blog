@@ -1,0 +1,26 @@
+.button {
+  position: relative;
+  display: inline-block;
+  color: white;
+  padding: $spacing * 1 $spacing * 3;
+  border-radius: 4px;
+  font-size: 1.4rem;
+  min-width: 15rem;
+  text-align: center;
+  z-index: 10;
+  border: 2px solid $interactive;
+  transition: all 0.3s;
+  background: $interactive;
+
+  &:hover {
+    background: darken($interactive, 10%);
+    border-color: darken($interactive, 10%);
+    color: white;
+  }
+
+  &--outline {
+    color: $interactive;
+    background: transparent;
+  }
+
+}

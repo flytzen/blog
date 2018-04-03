@@ -1,0 +1,21 @@
+.icon {
+
+  &__item {
+    display: inline-block;
+  }
+
+  &__gfx, &__txt {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  &__gfx {
+    fill: $light;
+  }
+
+  &__txt {
+    font-size: 1.3rem;
+    line-height: 2.4rem;
+  }
+
+}

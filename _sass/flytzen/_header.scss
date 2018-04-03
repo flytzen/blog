@@ -1,6 +1,10 @@
 .header {
-  background: pink;
-  padding: $spacing * 2 0;
+  background: $blue;
+  padding: $spacing * 4 0;
+
+  a {
+    color: white;
+  }
 
   .wrapper {
     display: flex;
@@ -9,12 +13,13 @@
   }
 
   &__title {
-    font-size: 3.2rem;
+    line-height: 1em;
     font-weight: 300;
   }
 
-  &__nav {
-    text-transform: uppercase;
+  &__nav-link {
+    @include link-txt();
+    margin-left: $spacing * 2;
   }
 
 }

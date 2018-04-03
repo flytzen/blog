@@ -1,0 +1,39 @@
+.card {
+  background: white;
+  padding: $spacing * 3;
+  margin-bottom: $spacing * 3;
+  border-radius: 3px;
+
+  &--simple {
+
+    .card__title {
+      margin-top: 0;
+    }
+
+  }
+
+  &__title {
+    margin-bottom: 0;
+  }
+
+  &__link {
+    border: 0;
+  }
+
+  &__date-time {
+    margin-top: $spacing / 2;
+    color: $soft;
+  }
+
+  &__cta {
+    text-align: right;
+  }
+
+  &__tag {
+    color: $interactive;
+    background: #eee;
+    border-radius: 3px;
+    padding: 0 $spacing * 2;
+  }
+
+}

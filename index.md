@@ -10,43 +10,24 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
 
 ***
 
-## My next talk:
+## My Next Talk
 
-<a href="https://www.meetup.com/dotnetoxford/events/247607774/">how to secure your web apps in Azure at .Net Oxford on 24 April</a>
+{% for talk in site.data.talkinstances limit:1 %}
+  {% include card.html type="simple" title=talk.title url=talk.link date-time=talk.date %}
+{% endfor %}
+
+<div class="cta cta--right">
+  <a href="" class="button">Talks</a>
+</div>
 
 ***
 
 ## Recent Blog Posts
 
-<div class="homeboxes">
-    <div class="homeblogbox">
-            <ul class="post-list">
-                {% for post in site.posts limit:4 %}
-                <li>
-                    <h3>
-                        <a href="{{ post.url | relative_url }}">
-                            {{ post.title | escape }}
-                        </a>
-                    </h3>
-                    <div class="excerpt">
-                        {{ post.excerpt | strip_html | truncatewords: 30 }}
-                    </div>
-                    <hr />
-                </li>
-                {% endfor %}
-            </ul>
+{% for post in site.posts limit:4 %}
+  {% include card.html title=post.title url=post.url date-time=post.date excerpt=post.excerpt cta='Read Post' %}
+{% endfor %}
 
-            <a href="/blog">More...</a>
-    </div>
-    <div class="homesidebar">
-        <div>
-            <h2><a href="/talks/">Speaking</a></h2>
-            <h3><a href="https://www.meetup.com/dotnetoxford/events/247607774/">How to secure your web app in Azure</a></h3>
-            <small>April 24, .Net Oxford</small>
-        </div>
-        <!-- <div>
-            <a class="twitter-timeline" href="https://twitter.com/flytzen" data-height="300">Tweets by @flytzen</a>
-            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-        </div> -->
-    </div>
+<div class="cta cta--right">
+  <a href="" class="button">Blog</a>
 </div>

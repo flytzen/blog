@@ -507,19 +507,6 @@ textarea {
   .highlight .il {
     color: #099; }
 
-.header {
-  background: pink;
-  padding: 1.6rem 0; }
-  .header .wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; }
-  .header__title {
-    font-size: 3.2rem;
-    font-weight: 300; }
-  .header__nav {
-    text-transform: uppercase; }
-
 html,
 body {
   padding: 0;
@@ -535,7 +522,7 @@ body {
   font-size: 1.6rem;
   font-weight: 400;
   line-height: 1.5;
-  background: #fdfdfd;
+  background: #f6f6f6;
   color: #111;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -580,17 +567,97 @@ h4, .h4 {
 pre {
   font-size: 1.2rem; }
 
-.page-content {
-  line-height: 1.5; }
-  .page-content a {
-    color: red; }
+hr {
+  border: 0;
+  height: 1px;
+  background: #999; }
 
-.link-txt {
-  font-size: 1rem;
-  font-weight: 700; }
+a {
+  color: #475b5a; }
+
+a:not(.button):not(.card a) {
+  border-bottom: 1px solid rgba(71, 91, 90, 0.25); }
+
+.cta {
+  padding: 0 2.4rem; }
+  .cta--right {
+    text-align: right; }
 
 .wrapper {
   width: 100%;
   max-width: 80rem;
   padding: 0 0.8rem;
   margin: 0 auto; }
+
+.header {
+  background: #475b5a;
+  padding: 3.2rem 0; }
+  .header a {
+    color: white; }
+  .header .wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; }
+  .header__title {
+    line-height: 1em;
+    font-weight: 300; }
+  .header__nav-link {
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 1.6rem; }
+
+.icon__item {
+  display: inline-block; }
+.icon__gfx, .icon__txt {
+  display: inline-block;
+  vertical-align: middle; }
+.icon__gfx {
+  fill: #cbcbcb; }
+.icon__txt {
+  font-size: 1.3rem;
+  line-height: 2.4rem; }
+
+.card {
+  background: white;
+  padding: 2.4rem;
+  margin-bottom: 2.4rem;
+  border-radius: 3px; }
+  .card--simple .card__title {
+    margin-top: 0; }
+  .card__title {
+    margin-bottom: 0; }
+  .card__link {
+    border: 0; }
+  .card__date-time {
+    margin-top: 0.4rem;
+    color: #999; }
+  .card__cta {
+    text-align: right; }
+  .card__tag {
+    color: #475b5a;
+    background: #eee;
+    border-radius: 3px;
+    padding: 0 1.6rem; }
+
+.button {
+  position: relative;
+  display: inline-block;
+  color: white;
+  padding: 0.8rem 2.4rem;
+  border-radius: 4px;
+  font-size: 1.4rem;
+  min-width: 15rem;
+  text-align: center;
+  z-index: 10;
+  border: 2px solid #475b5a;
+  transition: all 0.3s;
+  background: #475b5a; }
+  .button:hover {
+    background: #313e3e;
+    border-color: #313e3e;
+    color: white; }
+  .button--outline {
+    color: #475b5a;
+    background: transparent; }
