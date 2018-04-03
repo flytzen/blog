@@ -29,6 +29,10 @@
     text-align: right;
   }
 
+  &__tags {
+    margin-bottom: 2.4rem;
+  }
+
   &__tag {
     color: $interactive;
     background: #eee;

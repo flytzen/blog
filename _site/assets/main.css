@@ -635,6 +635,8 @@ a:not(.button):not(.card a) {
     color: #999; }
   .card__cta {
     text-align: right; }
+  .card__tags {
+    margin-bottom: 2.4rem; }
   .card__tag {
     color: #475b5a;
     background: #eee;
