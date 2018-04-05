@@ -522,7 +522,7 @@ body {
   font-size: 1.6rem;
   font-weight: 400;
   line-height: 1.5;
-  background: #f6f6f6;
+  background: #EBEBEB;
   color: #111;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -555,14 +555,12 @@ h1 {
 h2, .h2 {
   font-size: 3.6rem; }
 
-h3, .h3, h4, .h4 {
-  font-weight: 700; }
-
 h3, .h3 {
   font-size: 2.4rem; }
 
 h4, .h4 {
-  font-size: 1.8rem; }
+  font-size: 1.8rem;
+  font-weight: 700; }
 
 pre {
   font-size: 1.2rem; }
@@ -623,7 +621,8 @@ a:not(.button):not(.card a) {
   background: white;
   padding: 2.4rem;
   margin-bottom: 2.4rem;
-  border-radius: 3px; }
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
   .card--simple .card__title {
     margin-top: 0; }
   .card__title {
