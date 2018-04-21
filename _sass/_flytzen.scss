@@ -1,0 +1,166 @@
+@charset "utf-8";
+
+// Define defaults for each variable.
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,700');
+$base-font-family:      'Roboto', sans-serif !default;
+$base-font-size:        1.6rem !default;
+$base-font-weight:      400 !default;
+$base-line-height:      1.5 !default;
+$base-text-color:       #111 !default;
+
+$spacing:          0.8rem !default;
+
+$base-background-color: #EBEBEB !default;
+
+// Width of the content area
+$content-width:    80rem !default;
+
+// Colors
+// $blue: rgba(82, 209, 220, 1);
+$blue: rgba(71, 91, 90, 1);
+$color3: rgba(141, 142, 142, 1);
+$color4: rgba(163, 169, 170, 1);
+$color5: rgba(187, 187, 191, 1);
+
+$spot: $blue;
+$interactive: $blue;
+$light: #cbcbcb;
+$soft: #999;
+
+// Defaults and resets.
+@import
+  "flytzen/resets-helpers",
+  "flytzen/normalise",
+  "flytzen/syntax-highlighting"
+;
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	position: relative;
+	width: 100%;
+}
+
+html {
+	font-size: 62.5%; // Makes rem values realatable to px (eg 1.6 rem = 16px)
+}
+
+body {
+	font-family: $base-font-family;
+  font-size: $base-font-size;
+	font-weight: $base-font-weight;
+	line-height: $base-line-height;
+	background: $base-background-color;
+	color: $base-text-color;
+	text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Vertical Rhythum baby!
+
+h1,
+h2,
+h3,
+h4,
+hr,
+blockquote,
+p,
+ul,
+ol,
+pre {
+	margin-top: 2.4rem;
+	margin-bottom: 2.4rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+hr {
+	font-weight: 300;
+	line-height: 1em;
+}
+
+h1 {
+	font-size: 4.8rem;
+}
+
+h2, .h2 {
+	font-size: 3.6rem;
+}
+
+h3, .h3 {
+	font-size: 2.4rem;
+}
+
+h4, .h4 {
+	font-size: 1.8rem;
+  font-weight: 700;
+}
+
+pre {
+	font-size: 1.2rem;
+}
+
+hr {
+	border: 0;
+	height: 1px;
+	background: #999;
+}
+
+a {
+	color: $interactive;
+  border-bottom: 1px solid $interactive;
+  transition: all 0.3s;
+
+  &:hover {
+    color: darken($interactive, 10%);
+    border-bottom-color: transparent;
+  }
+}
+
+a:not(.button):not(.card a) {
+	border-bottom: 1px solid transparentize($blue, 0.75);
+}
+
+@mixin link-txt {
+	font-size: 1.3rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.cta {
+  padding: 0 $spacing * 3;
+
+	&--right {
+		text-align: right;
+	}
+
+}
+
+.wrapper {
+	width: 100%;
+	max-width: $content-width;
+	padding: 0 $spacing;
+	margin: 0 auto;
+}
+
+// Ahem - pretend this horrid styling hack isn't here!
+.blog-rss-top {
+  float: right;
+  margin-top: -6.8rem;
+}
+
+// Partial Styles
+@import
+  "flytzen/header",
+  "flytzen/icon",
+	"flytzen/card",
+  "flytzen/tags",
+	"flytzen/button",
+  "flytzen/post",
+  "flytzen/footer"
+;

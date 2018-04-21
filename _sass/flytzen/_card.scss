@@ -1,0 +1,38 @@
+.card {
+  background: white;
+  padding: $spacing * 3;
+  margin-bottom: $spacing * 3;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,.1);
+
+  &--simple {
+
+    .icon__txt {
+      color: #333;
+    }
+
+    .icon__gfx {
+      fill: #333;
+    }
+
+  }
+
+  &__title {
+    margin-top: $spacing;
+    line-height: 1.2;
+  }
+
+  &__link {
+    border: 0;
+  }
+
+  .date-time {
+    margin-top: $spacing / 2;
+    color: $soft;
+  }
+
+  &__cta {
+    text-align: right;
+  }
+
+}

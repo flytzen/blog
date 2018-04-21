@@ -1,0 +1,25 @@
+.header {
+  background: $spot;
+  padding: $spacing * 4 0;
+
+  a {
+    color: white;
+  }
+
+  .wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    line-height: 1em;
+    font-weight: 300;
+  }
+
+  &__nav-link {
+    @include link-txt();
+    margin-left: $spacing * 2;
+  }
+
+}
