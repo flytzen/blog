@@ -58,9 +58,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-
-}
+// Vertical Rhythum baby!
 
 h1,
 h2,
@@ -114,6 +112,13 @@ hr {
 
 a {
 	color: $interactive;
+  border-bottom: 1px solid $interactive;
+  transition: all 0.3s;
+
+  &:hover {
+    color: darken($interactive, 10%);
+    border-bottom-color: transparent;
+  }
 }
 
 a:not(.button):not(.card a) {
@@ -143,10 +148,19 @@ a:not(.button):not(.card a) {
 	margin: 0 auto;
 }
 
+// Ahem - pretend this horrid styling hack isn't here!
+.blog-rss-top {
+  float: right;
+  margin-top: -6.8rem;
+}
+
 // Partial Styles
 @import
   "flytzen/header",
   "flytzen/icon",
 	"flytzen/card",
-	"flytzen/button"
+  "flytzen/tags",
+	"flytzen/button",
+  "flytzen/post",
+  "flytzen/footer"
 ;

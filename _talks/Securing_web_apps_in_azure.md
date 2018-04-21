@@ -4,8 +4,6 @@ title: Securing Web Apps in Azure
 tags: azure security
 excerpt: So you have deployed your web app to Azure. Now, how do you make it more secure and compliant?
 ---
-
-# Securing Web Apps in Azure
 So you have deployed your web app to Azure. Now, how do you make it more secure and compliant?
 
 In this fast-paced talk we will run through an overview of some of the Azure technologies that you can use to better protect your web applications in Azure - all depending on your required security level, of course. The talk will set out a framework for you to consider which protections you want to put in place and provide you with the awareness of the tools at your disposal.

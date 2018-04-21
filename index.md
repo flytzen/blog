@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 ---
 # Welcome to my randomness
 
@@ -17,7 +17,7 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
 {% endfor %}
 
 <div class="cta cta--right">
-  <a href="" class="button">Talks</a>
+  <a href="/talks/" class="button">Talks</a>
 </div>
 
 ***
@@ -29,5 +29,5 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
 {% endfor %}
 
 <div class="cta cta--right">
-  <a href="" class="button">Blog</a>
+  <a href="/blog/" class="button">Blog</a>
 </div>

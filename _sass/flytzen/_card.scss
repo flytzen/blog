@@ -7,38 +7,32 @@
 
   &--simple {
 
-    .card__title {
-      margin-top: 0;
+    .icon__txt {
+      color: #333;
+    }
+
+    .icon__gfx {
+      fill: #333;
     }
 
   }
 
   &__title {
-    margin-bottom: 0;
+    margin-top: $spacing;
+    line-height: 1.2;
   }
 
   &__link {
     border: 0;
   }
 
-  &__date-time {
+  .date-time {
     margin-top: $spacing / 2;
     color: $soft;
   }
 
   &__cta {
     text-align: right;
-  }
-
-  &__tags {
-    margin-bottom: 2.4rem;
-  }
-
-  &__tag {
-    color: $interactive;
-    background: #eee;
-    border-radius: 3px;
-    padding: 0 $spacing * 2;
   }
 
 }

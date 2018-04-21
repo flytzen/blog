@@ -1,0 +1,75 @@
+.post {
+
+  &__header {
+    background: white;
+    padding: $spacing * 3 0 $spacing * 2 0;
+    margin-bottom: $spacing * 4;
+  }
+
+  &__title {
+    margin-top: 0;
+    line-height: 1.2;
+    margin-bottom: 1.4rem;
+  }
+
+  &__author-time {
+    margin-top: 2.4rem;
+    padding-bottom: $spacing;
+    border-bottom: 1px solid $base-background-color;
+  }
+
+  &__date-time {
+    float: right;
+  }
+
+  .tags {
+    padding-top: $spacing + 0.4rem;
+  }
+
+  &__content {
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    a[imageanchor] {
+      border: 0;
+    }
+
+    ul {
+      list-style-type: disc;
+      margin-left: 2.4rem;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin-left: $spacing * 2;
+      margin-right: $spacing * 2;
+    }
+
+    pre, code {
+      background: darken($base-background-color, 5%);
+      padding: $spacing * 2;
+      overflow-x: auto;
+    }
+
+  }
+
+  #disqus_thread {
+    margin-top: $spacing * 3;
+  }
+
+}
+
+.pullout {
+  background: white;
+  padding: $spacing * 2;
+  border-radius: 3px;
+  font-size: 1.4rem;
+
+  > p {
+    margin-top: 0;
+    margin-bottom: $spacing * 2;
+  }
+}

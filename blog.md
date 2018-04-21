@@ -3,7 +3,7 @@ layout: page
 title: Blog
 permalink: /blog/
 ---
-<div class="cta--right">
+<div class="cta--right blog-rss-top">
   <a href="{{ "/feed.xml" | relative_url }}" class="button" target="blank">Subscribe to RSS</a><br /><br />
 </div>
 
