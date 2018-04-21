@@ -7,7 +7,6 @@ comments: true
   <header class="post__header">
     <div class="wrapper">
       <h1 class="post__title" itemprop="name headline">{{ page.title | escape }}</h1>
-      {% if page.author || page.date %}
       <div class="post__meta">
         <div class="post__author-time">
           {% if page.author %}
@@ -37,7 +36,6 @@ comments: true
         </div>
         {% endif %}
       </div>
-      {% endif %}
     </div>
   </header>
 
