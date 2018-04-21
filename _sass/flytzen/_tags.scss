@@ -1,0 +1,11 @@
+.tags {
+  margin-bottom: $spacing * 3;
+}
+
+.tag {
+  color: $interactive;
+  background: #eee;
+  border-radius: 3px;
+  padding: 0 $spacing * 2;
+  border: 1px solid darken(#eee, 5%);
+}
