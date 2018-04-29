@@ -10,7 +10,7 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
 
 ***
 
-## My Next Talk
+<!-- ## My Next Talk
 
 {% for talk in site.data.talkinstances limit:1 %}
   {% include card.html type="simple" title=talk.title url=talk.link date-time=talk.date %}
@@ -20,7 +20,7 @@ When not doing that, I design and build systems at <a href="https://neworbit.co.
   <a href="/talks/" class="button">Talks</a>
 </div>
 
-***
+*** -->
 
 ## Recent Blog Posts
 
