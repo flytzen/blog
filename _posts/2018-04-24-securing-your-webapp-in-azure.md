@@ -28,6 +28,8 @@ Watching the video myself, I realised I say "Okay" and "So" way, way too much. S
 <div style="text-align:center">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/2tR5sEk46v0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
+  
+The source code is on [GitHub](https://github.com/flytzen/SecurityTalk).  
 
 ## Some key timings  
 
