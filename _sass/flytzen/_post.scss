@@ -50,10 +50,12 @@
 
     pre, code {
       background: darken($base-background-color, 5%);
-      padding: $spacing * 2;
-      overflow-x: auto;
+      overflow-x: auto;      
     }
-
+    pre code {  
+      padding: $spacing * 2; // This only works horizontally and not vertically :(
+      
+    }
   }
 
   #disqus_thread {

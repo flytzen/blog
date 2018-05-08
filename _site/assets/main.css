@@ -708,8 +708,9 @@ a:not(.button):not(.card a) {
   margin-right: 1.6rem; }
 .post__content pre, .post__content code {
   background: #dedede;
-  padding: 1.6rem;
   overflow-x: auto; }
+.post__content pre code {
+  padding: 1.6rem; }
 .post #disqus_thread {
   margin-top: 2.4rem; }
 
