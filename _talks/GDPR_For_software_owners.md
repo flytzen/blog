@@ -1,11 +1,11 @@
 ---
 layout: talksummary
 title: GDPR for people who own software
-tags: gdpr
+tags: GDPR
 excerpt: In this talk, I will highlight the key areas that you need to consider if you own software, whether you develop it for internal use or provide it to others.
 ---
 
-The new General Data Protection Regulations are nearly upon us and if you haven't started preparing yet, now would be a good time to panic.
+The new General Data Protection Regulations came into effect on 25 May 2018.
 
 In this talk, I will highlight the key areas that you need to consider if you own software, whether you develop it for internal use or provide it to others. I will give an overview of how GDPR applies to software products and how it impacts;
 

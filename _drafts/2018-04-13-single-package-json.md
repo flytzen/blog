@@ -13,22 +13,28 @@ We are increasinly building systems where we have multiple web apps for differen
 - You can't (currently) use things like [Green Keeper](TBD) to keep an eye on your versions.
 - Build times are longer because you have to run `npm install` for each app, downloading mostly the same dependencies. This is especially troublesome on build servers that don't cache between each build.
 
-**I am using Typescript and Webpack. Both the problems and solutions are specific to this combination so if you are not using these, this post is probably not for you**. I am also using React in this example, but that doesn't matter at all, it's just what I usually use. I also use `SASS` in the example but you should easily be able to subsitute that for something else.
+## Limitations
+
+- **I am using Typescript and Webpack. Both the problems and solutions are specific to this combination so if you are not using these, this post is probably not for you**.   
+
+- **If you are using Workbox then this solution is only partially applicable; In the solution outlined here, we use a single package.json and a single webpack.config. Workbox currently does not respect the `entryoint` setting in webpack.config so you will need a seperate webpack.config for each app. That will still give you the benefit of a single package.json, but build times will be longer than if you use a single webpack.config. On the plus side, it saves you some file copying shenanigans.**
+
+I am also using React in this example, but that doesn't matter at all, it's just what I usually use. I also use `SASS` in the example but you should easily be able to subsitute that for something else.
 For unit tests in this example I use [Alsatian](TBD). Alsatian requires me to first build the Typescript files myself so the examples here should be easily portable to other unit testing frameworks that have a similar requirement. Some unit testing frameworks will do the build for you - I can't help you there.
 
 I will assume that you are reasonably familiar with how to build a single app using Webpack, so I won't go into too much detail about that. You can always refer to the full solution on [GitHub](TBD) to see all the references and packages in use.
 
 ## Solution structure
-For the purposes of this, I have an example solution (find it on [GitHub](TBD)) like this:
---> Admin.App
---> Admin.Web
---> Customer.App
---> Customer.Web
+For the purposes of this, I have an example solution (find it on [GitHub](TBD)) like this:  
+--> Admin.App  
+--> Admin.Web  
+--> Customer.App  
+--> Customer.Web  
 
-The `*.App` folders hold the javascript app I am building. The `*.Web` folders would have a web application that can serve up the javascript app as well as provide various APIs etc. This could be ASP.Net Core, Node or whatever. It's not really important, the point is that after I build each app, I want to copy the generated `js` and `css` files to the relevant web folder. There are a million ways you may want to set this up and deploy it in practice, this is just one way.
+The `*.App` folders hold the javascript app I am building. The `*.Web` folders would have a web application that can serve up the javascript app as well as provide various APIs etc. This could be ASP.Net Core, Node or whatever. It's not really important, the point is that after I build each app, I want the generated `js` and `css` files to end up in the relevant web folder. There are a million ways you may want to set this up and deploy it in practice, this is just one way.
 
 ## Building the Typescript with Webpack
-In my example, I have a `src` folder in each App folder and under there I have an `index.tsx`. I want to build the Admin App to ./dist/js/adminapp.js and the equivalent for the Customer App. Note that the `dist` folder lives in the root of the solution. 
+In my example, I have a `src` folder in each App folder and under there I have an `index.tsx`. I want to build the Admin App to ./dist/adminapp/app.js and the equivalent for the Customer App. Note that the `dist` folder lives in the root of the solution. This is one of the first differences when using a single package.json and webpack.config file; you can only have a single destination directory.  
 You can see the `tsconfig.json` file I use on [GitHub](TBD). The important part is `webpack.config.js` which lives in the root of the solution and looks like this, at this point:
 ```
 const path = require("path");
@@ -44,7 +50,7 @@ const config = {
     },
     output: {
         path: path.resolve(__dirname, DIST_DIR),
-        filename: 'js/[name].js'
+        filename: '[name]/app.js'
     },
     resolve: {
           extensions: ['.ts', '.tsx', '.js']
@@ -79,10 +85,10 @@ The other important part is
 ```
     output: {
         path: path.resolve(__dirname, DIST_DIR),
-        filename: 'js/[name].js'
+        filename: '[name]/app.js'
     },
 ```
-which tells Webpack where to put the output. Note `[name]` parameter which tells Webpack to give each output file a different name. You could probably change that to `[name]/app.js` if you prefer to group the files by app.
+which tells Webpack where to put the output. Note `[name]` parameter which tells Webpack to give each output file a different name. 
 
 The full `package.json` is on [GitHub](TBD), but the key bit is just 
 ```
@@ -111,11 +117,21 @@ In order for Webpack to pick this up, we then need to add the `extract-text-webp
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractSass = new ExtractTextPlugin({
-    filename: "css/[name].css"
+    filename: "[name]/app.css"
 });
 ```
 
+and then add `extractSass` to the `plugins` section;
+
+```
+    plugins: [
+        new CheckerPlugin(),
+        extractSass
+    ]
+```
+
 ## Moving the resulting files
+At this point 
 
 ## Running linters
 
