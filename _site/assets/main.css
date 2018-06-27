@@ -706,11 +706,11 @@ a:not(.button):not(.card a) {
   font-style: italic;
   margin-left: 1.6rem;
   margin-right: 1.6rem; }
-.post__content pre, .post__content code {
-  background: #dedede;
-  overflow-x: auto; }
-.post__content pre code {
-  padding: 1.6rem; }
+.post__content pre, .post__content .highlighter-rouge .highlight {
+  background: #dedede; }
+.post__content pre {
+  padding: 0.8rem;
+  white-space: pre-wrap; }
 .post #disqus_thread {
   margin-top: 2.4rem; }
 

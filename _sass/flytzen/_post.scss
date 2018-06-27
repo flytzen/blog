@@ -48,14 +48,15 @@
       margin-right: $spacing * 2;
     }
 
-    pre, code {
+    pre, .highlighter-rouge .highlight {
       background: darken($base-background-color, 5%);
-      overflow-x: auto;      
     }
-    pre code {  
-      padding: $spacing * 2; // This only works horizontally and not vertically :(
-      
+
+    pre {
+      padding: 0.8rem;
+      white-space: pre-wrap;
     }
+
   }
 
   #disqus_thread {
