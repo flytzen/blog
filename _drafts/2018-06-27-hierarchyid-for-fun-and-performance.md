@@ -85,7 +85,7 @@ If you are already implementing Hierarchy IDs in the form of a delimited string,
 When you want to find the value for a particular Hierarchy ID for a particular node, you can recursively search for a configuration setting that matches the node's Hierarchy ID, or it's parent or the grand parent etc, all the way up to the root. This is obviously not very efficient to query so you would need to cache it (or keep the whole thing in memory if possible), but it makes it very easy to model and extend. 
 
 What you really want is something like (pseudo code)
-```
+```sql
 SELECT Value from Config WHERE
 Config.HierarchyID = SUBSTRING(node_hierarchy_id, LENGTH(Config.HierarchyID))
 ```
