@@ -3,7 +3,7 @@ layout: post
 title: CosmosDB token has wrong time
 date: '2018-05-08T12:00:00.000+01:00'
 author: Frans Lytzen
-tags: Azure, CosmosDB
+tags: Azure CosmosDB
 modified_time: '2018-05-08T12:00:00.000+01:00'
 excerpt: CosmosDB error "The authorization token is not valid at the current time" and how to fix it.
 ---

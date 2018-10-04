@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Publsh Nuget packages with Azure Dev Ops
+title: Publish Nuget packages with Azure Dev Ops
 date: '2018-10-03'
 author: Frans Lytzen
 tags: DevOps
