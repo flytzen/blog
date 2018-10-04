@@ -11,7 +11,7 @@ Whenever I decide to create a Nuget package, whether for OSS or to publish on ou
 
 My requirements are quite specific and may not be to everyone's liking;
 - I want to use [GitFlow](https://datasift.github.io/gitflow/IntroducingGitFlow.html) to control my branches, including using Pull Requests etc.
-- Whenever a commit is made to `develop` (or a PR is merged in), I want to publish that package with a "`-pre.123`" suffix as per [SemVer].(https://semver.org/)
+- Whenever a commit is made to `develop` (or a PR is merged in), I want to publish that package with a "`-pre.123`" suffix as per [SemVer](https://semver.org/)
 - Whenever the same happens to `master` I want to publish a "full" release.
 
 I haven't explicitly covered it here, but it would also be nice to have packages sat in a `release/*` branch be published with a `-beta.1` suffix - but you can easily extend it to cover that scenario as well.
@@ -52,7 +52,7 @@ I have an empty `<VersionSuffix>` as default. I probably don't actually need tha
 
 The next `<VersionSuffix>` uses the `Configuration` variable that is provided by the dotnet build process; if I build in Debug mode, the package version will become `1.2.3-debug`. This is mainly useful for local scenarios as I will always build in Release mode for publishing.  
 
-The `<VersionSuffix>` after that looks at an environment variable provided by Azure DevOps when you are running in the pipeline. This means that if I am building from the `develop` branch in an Azure Pipeline then it will set the Suffix. `Build_BuildID` is another environment variable provided by Azure Dev Ops to the pipeline, which will always increment. So, in the example here I may end up with a version number of `1.2.3-pre.6239`. As long as that last nunber reliably increments (which it does) you are fine for package control.  
+The `<VersionSuffix>` after that looks at an environment variable provided by Azure DevOps when you are running in the pipeline. This means that if I am building from the `develop` branch in an Azure Pipeline then it will set the Suffix. `Build_BuildID` is another environment variable provided by Azure Dev Ops to the pipeline, which will always increment. So, in the example here I may end up with a version number of `1.2.3-pre.6239`. As long as that last number reliably increments (which it does) you are fine for package control.  
 There is another variable called `Build_BuildNumber` which you may be tempted to use instead. However, I found some scenarios where that variable would have the name of the pipeline instead of a number, which causes the build to fail.
 
 For more advanced scenarios you can invent your own attributes, which become variables in their own right, which you can then re-combine in other ways.
