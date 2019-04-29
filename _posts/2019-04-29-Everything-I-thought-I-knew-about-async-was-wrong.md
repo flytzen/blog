@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Everything I though I knew about Async in C# was wrong
+title: Everything I thought I knew about Async in C# was wrong
 date: '2019-04-29'
 author: Frans Lytzen
 tags: C#
