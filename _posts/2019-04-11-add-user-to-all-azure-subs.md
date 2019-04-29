@@ -3,7 +3,7 @@ layout: post
 title: Add new user to all my Azure subscriptions
 date: '2019-04-11'
 author: Frans Lytzen
-tags: DevOps
+tags: DevOps Azure
 modified_time: '2019-04-11'
 excerpt: Add a new user to all my Azure subscriptions using Azure CLI
 ---
