@@ -12,6 +12,8 @@ Async certainly can help you do more I/O in parallel and may in some circumstanc
 
 Understanding how Async in C# works under the covers is crucial to be able to harness the benefits it can give you, whilst avoiding the pitfalls. This session aims to give you that understanding.
 
+Note that this talk will not show the generated IL; It focuses on the principles and uses pseudo-code to explain what is generated.
+
 So far I have delivered the talk at [Dotnet Oxford](https://www.meetup.com/dotnetoxford/) and at [DDD South West](https://dddsouthwest.com/) - thanks for having me!
 
 The presentation and the code samples [are on GitHub](https://github.com/flytzen/Async.Presentation) and I have also recorded it as a video - see my [related blogpost]({% post_url 2019-04-29-Everything-I-thought-I-knew-about-async-was-wrong %}).
