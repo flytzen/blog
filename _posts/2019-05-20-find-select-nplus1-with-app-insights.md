@@ -3,7 +3,7 @@ layout: post
 title: Find SELECT N+1 with Application Insights
 date: '2019-05-20'
 author: Frans Lytzen
-tags: C#
+tags: Azure
 modified_time: '2019-05-20'
 excerpt: With ORMs it's very easy to write code that calls SQL many times to serve a single web requests, and it can be hard to find it. Application Insights can help.
 ---
