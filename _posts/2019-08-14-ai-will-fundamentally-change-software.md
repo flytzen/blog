@@ -36,8 +36,6 @@ The most obvious thing that springs to mind when you talk about things like Mach
 Maybe more relevant to people likely to read this post is things like assessing the contents of online forms to decide on actions.  
 For example, today you may have people submitting an annual health survey and have a health practitioner review these questionnaires to assess who are fine, who should receive a phone call, who should have a face-to-face visit and so. You *can* automate that today using hard-coded rules, but it's probably a lot easier to analyse what the health practitioner actually decides and then train a Machine Learning model on that data.  
 
-As another example, I recently spoke to a social enterprise who use Open Banking data to automatically assess whether to issue small loans. Currently they have put some simple hard-coded rules in place, but you can easily see how they could make that more sophisticated with Machine Learning.
-
 In practical teams, there are a few things you can do now to start this journey;
 - Understand that it's not about getting to 100% accuracy. In most cases, Machine Learning models will spit out a **probability** so you can put a rule in to say that when that probability is less than, say, 90% then this thing is referred to a human being for assessment.   
 This data can then be used to further refine the model, making it ever more accurate (you should also randomly refer some high-probability cases to a human on an ongoing basis to check and adjust the model over time).  
@@ -57,13 +55,19 @@ Azure also has similar things for security, threat detection and logins, where t
 
 You can use this approach in many different ways in your own software. For example, a known indicator of mental health problems is if someone all of a sudden starts working a lot more hours. So you could use Machine Learning to automatically establish a baseline for "normal" hours *for each individual* in your company (assuming they record timesheets) and flag it up to their manager if all of a sudden their patterns change, giving you a chance to intervene early. There are standard tools out there to help you with that, including [Azure's Anomaly Detector](https://azure.microsoft.com/en-gb/services/cognitive-services/anomaly-detector/).
 
-You may have similar things in a UI where, for example, the system learns over time what kind and level of expenses a person normally records and alerts them if they enter something that is unusual for them. These are not system-wide rules, simply knowing that it's normal for a particular individual to claim £50 for train tickets, but not £500. Or maybe that when you record mileage, more often than not it's to a particular location so it can auto-suggest the description and distance.
+When you are designing systems, these kind of technologies need to be in your mind. Do you rely on someone manually checking for deviations or do you have alerts or hard-coded rules to detect anomalies?
+
+# Make suggestions and correct errors
+When you receive a text message on your phone or an IM on LinkedIn, you will often be given some suggested answers; These are based on Machine Learning to analyse what the message sent to you was about and what people normally respond with in similar situations.
+
+![Example of LinkedIn suggesting replies](/assets/LinkedInIM.jpg)
+
+You may have similar things in a UI where, for example, the system learns over time what kind and level of expenses a person normally records and alerts them if they enter something that is unusual for them. These are not system-wide rules, simply knowing that it's normal for a particular individual to claim £50 for train tickets, but not £500. Or maybe that when you record mileage, more often than not it's to a particular location so it can auto-suggest the description and distance.  
 
 The list of examples get longer, the more you allow yourself to think about it, starting with detecting deviations from normal to understanding what you probably meant and suggesting that. [Google's Autodraw experiment](https://www.autodraw.com/) is an amazing example of this.
 
-When you are thinking about both UX and business processes - these kind of technologies need to be in your mind. Do you rely on someone manually checking this for deviations? Are there places where users make mistakes and we can help them not to? Are there whole new categories of problems we simply haven't been able to solve before?
+When you are thinking about both UX and business processes - these kind of technologies need to be in your mind. Are there places where users make mistakes and we can help them not to? Are there whole new categories of problems we simply haven't been able to solve before?
 One thing's for sure, this is becoming the new normal so you need to incorporate it in your design thinking.
-
 
 # Intent driven UI
 I think this is probably the most challenging and different area. 
@@ -78,7 +82,7 @@ Now imagine doing that same journey on most travel booking sites that exists tod
 ![Example of a travel booking site](/assets/HolidayBooking.jpg)
 (*I do like Crystal's site that I stole this picture from - I think it's one of the better ones out there, but it illustrates the point nicely. Hope they will forgive me.*)
 
-With a more conversational UI and Machine Learning techniques, that journey could be much more like talking to an operator. Understand me right, building that system is **hard**; current Artificial Intelligence is not magic and cannot "think" in any meaningful way. Underneath the covers, that nice conversation with the user still has to be translated into those same tick-boxes, so you can show them filtered results. Natural Language Processing can *help* - but you need to identify all the intents yourself. This is not trivial but I truly believe this is where software design for casual users is going. I believe we may see a (temporary) upsurge in slightly more hybrid solutions where artificial intelligence techniques are used but with operators being pulled in when the AI does not know what to do. However, the data gathered during those interactions will feed back into the AI model and the need for operator intervention will taper off.
+With a more conversational UI and Machine Learning techniques, that journey could be much more like talking to an operator. Understand me right, building that system is **hard**; current Artificial Intelligence is not magic and cannot "think" in any meaningful way. Underneath the covers, that nice conversation with the user still has to be translated into those same tick-boxes, so you can show them filtered results. Natural Language Processing can *help* - but you need to identify all the intents yourself. This is not trivial but I truly believe this is where software design for occasional users is going. I believe we may see a (temporary) upsurge in slightly more hybrid solutions where artificial intelligence techniques are used but with operators being pulled in when the AI does not know what to do. However, the data gathered during those interactions will feed back into the AI model and the need for operator intervention will taper off.
 
 Is the technology and the patterns there to build the dream travel booking site I describe here yet? Probably not. But it's coming and you should start thinking about how you can start gathering the data to train those models; what can you do today to capture information about how your users express their intent?
 
@@ -88,15 +92,17 @@ In practice this isn't just for complicated things like travel agent bookings; i
 
 Building conversational UIs that actually work is really hard - but it is getting easier every day and it will start to become an expectation for more and more people. Just think about how we engage with our various digital assistants. Even the humble Google Search is a lot more than just a "search", you can ask it to translate things or do math amongst many other things.  
 
-When will your customers begin to expect that they can just log in to your portal and ask a question like "when will my loan be approved", rather than having to click through the menus to find the list of loan applications, open it and see the status there?
+When will your customers begin to expect that they can just log in to your portal and ask a question like "when will my t-shirt arrive", rather than having to click on their account, list their orders, click on the right one and go through to "tracking"?
 
 
 # Re-imaging problems fundamentally
 All the above has really been about how we change existing types of software and problems to take advantage of AI to make it better or more efficient. For most of us, that is probably the primary thing we need to worry about because that **isn't going away anytime soon**. 
 
 But there is also another whole class of problems that we can start to solve that simply wasn't possible before.  
-For example, there are some emerging examples of personalised finance and insurance where AI is used to create products tailored completely to one individual person; for low-value products that would never have been possible before. I think that as the tools get better and we get more used to thinking about how to *apply* AI to the real-world, many, many more scenarios and new types of products will begin to emerge.
 
+I recently spoke to [Salad Money](https://www.saladmoney.co.uk/), a Social Enterprise that provide small, short-term loans. They use Open Banking and have fully automated their loan approval process, making it possible to provide these small, cheap loans cost-effectively and at scale. As they build up more data, they will be able to use Machine Learning to provide more tailored products to individuals, without having complicated or unfair assessment processes. 
+
+This general ability to take what used to be quite complicated things that required expert involvement, automate it and deploy it at scale is something I, personally, am quite excited about and I think we will see a lot of innovation in that space.
 
 # So what do I do now?
 I am on the journey myself, I don't know the answers. 
@@ -115,6 +121,6 @@ The best way I can achieve that is by seeing as many examples as I can. That mea
 As a secondary goal, I also want to learn enough about the practical realities that I can at least do a proof-of-concept in order to show that there could be value.  
 For example, I have identified some client scenarios that can benefit from automating classification as described above. I can use high-level tools, such as [ML.Nets Model Builder](https://marketplace.visualstudio.com/items?itemName=MLNET.07) to do a proof-of-concept without understanding the difference between a Bayes Classifier and a Logistic Regression algorithm, knowing how to do hyperparameter tuning or even clean my data that much. Would I put the result into production? Of course not. But if I can show a model that has 80% accuracy after tinkering for a couple of hours, I can create the business case for engaging a data scientist to build the real thing. And yes, I am learning Jupyter Notebooks and all that as well, but the truth is that I don't actually need the grown-up tools yet.
 
-At [NewOrbit](https://neworbit.co.uk) we are actively embracing this journey. We are working on training programs for everyone from sales, through business analysts to developers so they can help our customers take advantage of this revolution in software design. We are also building some of our product in order to test our skills and showcase what's possible (and to have a bit of fun along the way).
+At [NewOrbit](https://neworbit.co.uk) we are actively embracing this journey. We are working on training programs for everyone from sales, through business analysts to developers so they can help our customers take advantage of this revolution in software design. We are also building some of our own products in order to test our skills and showcase what's possible (and to have a bit of fun along the way).
 
-Are you learning AI? Do you think this will affect software design as much as I do? Leave a comment below with your views - I'd love to discuss this with more people.
+Are you learning AI? Do you think this will affect software design as much as I do? Leave a comment with your views or contact me on [Twitter](https://twitter.com/flytzen) - I'd love to discuss this with more people.
