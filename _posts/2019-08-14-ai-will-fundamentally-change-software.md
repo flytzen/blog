@@ -16,7 +16,7 @@ You are quite likely to read this as alarmist and you will probably want to dism
 - A business process is a business process.   
 *No, it's not. AI allows many business process to be completely re-defined or eliminated.*  
 
-- You still need to build - and know how to build - all the resilience and scale and micro services and database and so on.  
+- I still need to build - and know how to build - all the resilience and scale and micro services and database and so on, all that AI doesn't remove the need for that.  
 *True - but it's no longer enough and you may find yourself being really good at solving the wrong problem.*
 
 - Real people don't want to [make some change you can't imagine should change].  
