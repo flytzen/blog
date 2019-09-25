@@ -95,7 +95,7 @@ Building conversational UIs that actually work is really hard - but it is gettin
 When will your customers begin to expect that they can just log in to your portal and ask a question like "when will my t-shirt arrive", rather than having to click on their account, list their orders, click on the right one and go through to "tracking"?
 
 
-# Re-imaging problems fundamentally
+# Re-imagining problems fundamentally
 All the above has really been about how we change existing types of software and problems to take advantage of AI to make it better or more efficient. For most of us, that is probably the primary thing we need to worry about because that **isn't going away anytime soon**. 
 
 But there is also another whole class of problems that we can start to solve that simply wasn't possible before.  
