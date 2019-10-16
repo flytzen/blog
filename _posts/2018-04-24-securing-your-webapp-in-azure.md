@@ -10,6 +10,8 @@ tags:
 modified_time: '2018-04-29T21:40:00.000+01:00'
 
 ---
+*[There is an updated version of this talk from DDD 14]({% post_url 2019-10-16-secure-your-webapp-in-azure-at-ddd14 %})*
+
 So you have deployed your web app to Azure. Now, how do you go about making it secure?
 I gave a talk on this topic at  [DotNet Oxford](https://www.meetup.com/dotnetoxford/) on 24 April 2018 and recorded it. You can view the video below.   
 

@@ -154,6 +154,22 @@ a:not(.button):not(.card a) {
   margin-top: -6.8rem;
 }
 
+table {
+	border-collapse: collapse;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+
+th {
+	background-color: #475b5a;
+	color:white;
+}
+
+td, th {
+	border: 1px solid silver;
+	padding: 5px;
+}
+
 // Partial Styles
 @import
   "flytzen/header",

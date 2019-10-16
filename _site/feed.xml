@@ -1,4 +1,115 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2019-09-25T15:47:38+01:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Can a SHA256 Hash have a “/” in it?</title><link href="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html" rel="alternate" type="text/html" title="Can a SHA256 Hash have a &quot;/&quot; in it?" /><published>2019-09-25T00:00:00+01:00</published><updated>2019-09-25T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash</id><content type="html" xml:base="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html">&lt;p&gt;I was recently asked whether a SHA265 hash could have a “/” in it. If you know how hashes work, you probably know that the question doesn’t make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I’ve been doing this for a long time and some of the details were rather opaque to me until recently.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2019-10-16T15:46:48+01:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Secure your Web App in Azure at DDD14</title><link href="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html" rel="alternate" type="text/html" title="Secure your Web App in Azure at DDD14" /><published>2019-10-16T00:00:00+01:00</published><updated>2019-10-16T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14</id><content type="html" xml:base="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html">&lt;p&gt;I had the great please of giving an updated version of my &lt;a href=&quot;/talks/Securing_web_apps_in_azure.html&quot;&gt;“Secure your Web App in Azure” talk&lt;/a&gt; talk at &lt;a href=&quot;https://developerdeveloperdeveloper.com/&quot;&gt;Developer Developer Developer 14&lt;/a&gt; in Reading on 12 October 2019.&lt;/p&gt;
+
+&lt;p&gt;A video of the whole talk is available below.&lt;/p&gt;
+
+&lt;p&gt;I touch on a whole range of Azure technologies, but mostly I introduce and expand on a simple framework to think about and manage your exposure.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-of-exposure-and-mitigation&quot;&gt;Example of exposure and mitigation&lt;/h2&gt;
+&lt;table&gt;
+&lt;tr&gt;
+    &lt;th&gt;&lt;/th&gt;
+    &lt;th&gt;External Actors&lt;/th&gt;
+    &lt;th&gt;Internal Actors&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+    &lt;th&gt;PREVENT&lt;/th&gt;
+    &lt;td&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                Secure your code – see Troy Hunt’s courses as a starting point.
+            &lt;/li&gt;
+            &lt;li&gt;
+                Lock down your servers
+            &lt;/li&gt;
+            &lt;li&gt;
+                Use Firewalls and Intrusion Detection/Prevention Systems
+            &lt;/li&gt;
+            &lt;li&gt;
+                Encrypt everything in transit
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/td&gt;
+    &lt;td&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                Protect your passwords/secrets
+            &lt;/li&gt;
+            &lt;li&gt;
+                Process for granting and removing access
+            &lt;/li&gt;
+            &lt;li&gt;
+                Use Azure AD for all access, including SQL
+            &lt;/li&gt;
+            &lt;li&gt;
+                Audit who has access on a regular basis and remove unnecessary access
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+    &lt;th&gt;DETECT&lt;/th&gt;
+    &lt;td&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                Log and alert on any unusual application activity
+                &lt;ul&gt;
+                    &lt;li&gt;
+                        403s and 404s
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        Failed logins
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        High CPU/memory, increased load
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        Etc
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/li&gt;
+            &lt;li&gt;
+                Use Advanced Threat Protection
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/td&gt;
+    &lt;td&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                Log and alert on all access to the backend by internal users
+            &lt;/li&gt;
+            &lt;li&gt;
+                Log and alert on unusual access patterns by application users
+            &lt;/li&gt;
+            &lt;li&gt;
+                Consider DLP tools
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+    &lt;th&gt;MITIGATE&lt;/th&gt;
+    &lt;td colspan=&quot;2&quot;&gt;
+        &lt;ul&gt;
+            &lt;li&gt;
+                Encrypt sensitive data at the application layer
+            &lt;/li&gt;
+            &lt;li&gt;
+                Have ways of locking out certain users or IP addresses
+            &lt;/li&gt;
+            &lt;li&gt;
+                For very sensitive systems, consider multi-layered architectures to contain breaches
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/td&gt;
+    
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;video-of-the-whole-talk&quot;&gt;Video of the whole talk&lt;/h2&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/HZgjlTi7OiA&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="SQL" /><category term="Security" /><category term="Web" /><summary type="html">I was recently asked whether a SHA256 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry><entry><title type="html">Can a SHA256 Hash have a “/” in it?</title><link href="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html" rel="alternate" type="text/html" title="Can a SHA256 Hash have a &quot;/&quot; in it?" /><published>2019-09-25T00:00:00+01:00</published><updated>2019-09-25T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash</id><content type="html" xml:base="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html">&lt;p&gt;I was recently asked whether a SHA256 hash could have a “/” in it. If you know how hashes work, you probably know that the question doesn’t make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I’ve been doing this for a long time and some of the details were rather opaque to me until recently.&lt;/p&gt;
 
 &lt;p&gt;The short answer is that the “/” question comes about because we usually base64 encode hashes, because they are represented as byte arrays, because they are large numbers - meaning that the question really is “how do I avoid ‘/’ in base64 encoding”.&lt;/p&gt;
 
@@ -38,7 +149,7 @@ The recipient will create the hash in the same way you did. They will then &lt;e
 
 &lt;p&gt;It turns out that, by default, base64 may produce “/” in it’s output and that can be problematic in some scenarios, such as when including it in URLs.&lt;/p&gt;
 
-&lt;p&gt;So, can a SHA265 Hash include a “/”? No - but the base64 representation of &lt;em&gt;any&lt;/em&gt; hash might. See &lt;a href=&quot;https://en.wikipedia.org/wiki/Base64&quot;&gt;Wikipedia&lt;/a&gt; for a deeper discussion of base64 and see the “URL Applications” section for some tips on how to modify base64 to make it safe in URLs.&lt;/p&gt;
+&lt;p&gt;So, can a SHA256 Hash include a “/”? No - but the base64 representation of &lt;em&gt;any&lt;/em&gt; hash might. See &lt;a href=&quot;https://en.wikipedia.org/wiki/Base64&quot;&gt;Wikipedia&lt;/a&gt; for a deeper discussion of base64 and see the “URL Applications” section for some tips on how to modify base64 to make it safe in URLs.&lt;/p&gt;
 
 &lt;h1 id=&quot;why-is-the-hash-a-byte-array-anyway&quot;&gt;Why is the hash a byte array anyway?&lt;/h1&gt;
 &lt;p&gt;When I think about a byte array I think about video files and other binary data so I struggled to understand why the hash algorithms insist on returning byte arrays. I mean, why can’t it just give me a string?&lt;/p&gt;
@@ -46,7 +157,7 @@ The recipient will create the hash in the same way you did. They will then &lt;e
 &lt;p&gt;&lt;strong&gt;It’s because a hash algorithm doesn’t actually produce a byte array at all.&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;Hash algorithms produce a very large &lt;em&gt;number&lt;/em&gt;. For example the SHA1 algorithm produces a 160-bit number; That means it takes 160 0s and 1s to write it. In base 10 it would take about 48 digits to write it out. SHA256 produces a 256 bit number, SHA512 a 512 bit number and so on.&lt;br /&gt;
-Our programming languages don’t generally have built-in types that can represent numbers that large, so the 256 bits are simply chopped into 8-bit chunks and presented to you as a byte array because there is no other easy way to do it - but you should really think about it as a single number with 256 binary digits.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="C#" /><category term="Technology" /><summary type="html">I was recently asked whether a SHA265 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry><entry><title type="html">AI will fundamentally change how we build software</title><link href="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html" rel="alternate" type="text/html" title="AI will fundamentally change how we build software" /><published>2019-08-14T00:00:00+01:00</published><updated>2019-08-14T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software</id><content type="html" xml:base="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html">&lt;p&gt;Artificial Intelligence/Machine Learning/bots are set to fundamentally change how we design and build software - even how we think about the problems we create software to solve.&lt;/p&gt;
+Our programming languages don’t generally have built-in types that can represent numbers that large, so the 256 bits are simply chopped into 8-bit chunks and presented to you as a byte array because there is no other easy way to do it - but you should really think about it as a single number with 256 binary digits.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="C#" /><category term="Technology" /><summary type="html">I was recently asked whether a SHA256 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry><entry><title type="html">AI will fundamentally change how we build software</title><link href="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html" rel="alternate" type="text/html" title="AI will fundamentally change how we build software" /><published>2019-08-14T00:00:00+01:00</published><updated>2019-08-14T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software</id><content type="html" xml:base="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html">&lt;p&gt;Artificial Intelligence/Machine Learning/bots are set to fundamentally change how we design and build software - even how we think about the problems we create software to solve.&lt;/p&gt;
 
 &lt;p&gt;I believe it’s a revolution on par with the move to web and I think many people working in the industry are yet to fully realise this. If you are a business analyst, architect, developer or even a business process specialist, your world is about to be turned upside down and you will have to learn a completely new skill-set or face becoming increasingly irrelevant.&lt;/p&gt;
 
@@ -526,26 +637,4 @@ In the spring of 2018 I recorded a video with Microsoft that gives an overview o
 
 &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/KlZhAG351Bs&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
 
-&lt;p&gt;For some more specific tips on how to lock down your software on Azure, including Managed Identity and KeyVault, see &lt;a href=&quot;/2018/04/29/securing-your-webapp-in-azure.html&quot;&gt;Securing your web app in Azure&lt;/a&gt;`&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="GDPR" /><category term="Security" /><summary type="html">A video recording I made with Microsoft about how GDPR applies to Software development and how Azure can help.</summary></entry><entry><title type="html">CosmosDB token has wrong time</title><link href="https://www.lytzen.name/2018/05/08/Comos-db-token-failure.html" rel="alternate" type="text/html" title="CosmosDB token has wrong time" /><published>2018-05-08T12:00:00+01:00</published><updated>2018-05-08T12:00:00+01:00</updated><id>https://www.lytzen.name/2018/05/08/Comos-db-token-failure</id><content type="html" xml:base="https://www.lytzen.name/2018/05/08/Comos-db-token-failure.html">&lt;p&gt;Out of the blue, we started receiving the following error in our web app that uses CosmosDB:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;The authorization token is not valid at the current time. Please create another token and retry (token start time: Tue, 08 May 2018 09:17:33 GMT, token expiry time: Tue, 08 May 2018 09:32:33 GMT, current server time: Tue, 08 May 2018 09:11:00 GMT
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The important things to note here are &lt;code class=&quot;highlighter-rouge&quot;&gt;token start time: Tue, 08 May 2018 09:17:33 GMT&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;current server time: Tue, 08 May 2018 09:11:00 GMT&lt;/code&gt;.&lt;br /&gt;
-The token has a start time &lt;em&gt;in the future&lt;/em&gt;. As a consequence, any request to CosmosDB made with this token fails.&lt;/p&gt;
-
-&lt;p&gt;It took us a while to diagnose this because we just assumed that &lt;code class=&quot;highlighter-rouge&quot;&gt;current server time&lt;/code&gt; referred to the time on the Web server, but it actually refers to the time on the CosmosDB server.&lt;br /&gt;
-We could see that the &lt;code class=&quot;highlighter-rouge&quot;&gt;current server time&lt;/code&gt; was correct, in that it matched the known correct time on other servers.&lt;/p&gt;
-
-&lt;p&gt;What it boils down to is that the time on our webserver was wrong, specifically it was in the future, and the .Net client SDK was dutifully creating access tokens that started in the future.&lt;/p&gt;
-
-&lt;p&gt;If you are running your app on your own server or a VM, you can stop reading now and go reset the time on your server and all will be well. What was really weird for us was that we are running this in a Web App in Azure App Services. They are supposed to be time synchronised and it simply shouldn’t be possible for their clock to drift. Except it did. We triangulated the problem by running the same code from another location and eventually from a web app deployed to a different App Service Plan.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;If you are experiencing this problem in Azure Web App, the TL;DR; is to scale your site &lt;em&gt;up&lt;/em&gt;, for example from an S1 to an S2 and then down again later. Details as to why are below.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;The thing to remember here is that an App Service Plan is what encapsulates the underlying hardware that actually hosts the App Services. We had an App Service Plan with a single node in it and &lt;em&gt;all&lt;/em&gt; Web Apps deployed to this App Service Plan failed with the same error. Which is logical when you think about it, but easy to forget in the heat of battle.&lt;br /&gt;
-We confirmed the issue by going to the “Advanced Tools” and, using the Powershell console, ran &lt;code class=&quot;highlighter-rouge&quot;&gt;Get-Date&lt;/code&gt;, which showed us that the web-server time was wrong.&lt;/p&gt;
-
-&lt;p&gt;In our case we had just a single node in the App Service Plan. If you had multiple nodes and only one had time-drifted, you’d probably see the error intermittently and the &lt;code class=&quot;highlighter-rouge&quot;&gt;Get-Date&lt;/code&gt; would just return the time from whatever server the console happened to be running on. If you suspect this situation, it may be worthwhile scaling your app service plan down to a single node, testing it and scaling out again.&lt;/p&gt;
-
-&lt;p&gt;What we needed was for Azure to kill our faulty node so we would automatically roll on to another node with the correct time. Unfortunately there are no tools to do this (and you wouldn’t expect to have to). However, there is a way you can do it and it was literally the process of writing this post that made me think about it, so I’ve just stopped writing to go fix the problem; Simply scale your site &lt;em&gt;up&lt;/em&gt; and then down again. For example, if you are on an S1, scale to an S2 as this will force Azure to deploy your site on a new underlying machine. You can scale back down again when you are happy.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="CosmosDB" /><summary type="html">CosmosDB error &quot;The authorization token is not valid at the current time&quot; and how to fix it.</summary></entry></feed>
+&lt;p&gt;For some more specific tips on how to lock down your software on Azure, including Managed Identity and KeyVault, see &lt;a href=&quot;/2018/04/29/securing-your-webapp-in-azure.html&quot;&gt;Securing your web app in Azure&lt;/a&gt;`&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="GDPR" /><category term="Security" /><summary type="html">A video recording I made with Microsoft about how GDPR applies to Software development and how Azure can help.</summary></entry></feed>

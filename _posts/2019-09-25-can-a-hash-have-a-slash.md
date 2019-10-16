@@ -5,9 +5,9 @@ date: '2019-09-25'
 author: Frans Lytzen
 tags: C# Technology
 modified_time: '2019-09-25'
-excerpt: I was recently asked whether a SHA265 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
+excerpt: I was recently asked whether a SHA256 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
 ---
-I was recently asked whether a SHA265 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
+I was recently asked whether a SHA256 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
 
 The short answer is that the "/" question comes about because we usually base64 encode hashes, because they are represented as byte arrays, because they are large numbers - meaning that the question really is "how do I avoid '/' in base64 encoding".
 
@@ -46,7 +46,7 @@ When you generate a hash in code, you will get a *byte array* - not a string. In
 
 It turns out that, by default, base64 may produce "/" in it's output and that can be problematic in some scenarios, such as when including it in URLs. 
 
-So, can a SHA265 Hash include a "/"? No - but the base64 representation of *any* hash might. See [Wikipedia](https://en.wikipedia.org/wiki/Base64) for a deeper discussion of base64 and see the "URL Applications" section for some tips on how to modify base64 to make it safe in URLs.
+So, can a SHA256 Hash include a "/"? No - but the base64 representation of *any* hash might. See [Wikipedia](https://en.wikipedia.org/wiki/Base64) for a deeper discussion of base64 and see the "URL Applications" section for some tips on how to modify base64 to make it safe in URLs.
 
 # Why is the hash a byte array anyway? 
 When I think about a byte array I think about video files and other binary data so I struggled to understand why the hash algorithms insist on returning byte arrays. I mean, why can't it just give me a string?   

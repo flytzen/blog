@@ -18,4 +18,4 @@ Know when someone is trying to get in by using Log Analytics, Alerts and SQL Azu
 Stop ongoing attacks and limit the impact of attacks by blocking their access, partitioning your application, ensuring attackers can't get at further credentials and limit what data they can get access to.
 
 ## Instances
-I last did this talk at [Rg-Dev in Rzeszow, Poland]({% post_url 2019-05-28-azure-security-at-rg-dev %}). 
+I last did this talk at [Rg-Dev in Rzeszow, Poland]({% post_url 2019-05-28-azure-security-at-rg-dev %}) and at [DDD 14](https://developerdeveloperdeveloper.com/) in [Reading on 12 October 2019]({% post_url 2019-10-16-secure-your-webapp-in-azure-at-ddd14 %}). 
