@@ -7,7 +7,7 @@ tags: Azure SQL Security Web
 modified_time: '2019-10-16'
 excerpt: I was recently asked whether a SHA256 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
 ---
-I had the great please of giving an updated version of my ["Secure your Web App in Azure" talk](/talks/Securing_web_apps_in_azure.html) talk at [Developer Developer Developer 14](https://developerdeveloperdeveloper.com/) in Reading on 12 October 2019.
+I had the great pleasure of giving an updated version of my ["Secure your Web App in Azure" talk](/talks/Securing_web_apps_in_azure.html) talk at [Developer Developer Developer 14](https://developerdeveloperdeveloper.com/) in Reading on 12 October 2019.
 
 A video of the whole talk is available below.
 
