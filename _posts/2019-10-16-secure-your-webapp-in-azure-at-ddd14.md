@@ -5,7 +5,7 @@ date: '2019-10-16'
 author: Frans Lytzen
 tags: Azure SQL Security Web
 modified_time: '2019-10-16'
-excerpt: I was recently asked whether a SHA256 hash could have a "/" in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.
+excerpt: An overview of how to secure Azure Web Apps, touching on virtual networks, encryption, key vault and monitoring.
 ---
 I had the great pleasure of giving an updated version of my ["Secure your Web App in Azure" talk](/talks/Securing_web_apps_in_azure.html) talk at [Developer Developer Developer 14](https://developerdeveloperdeveloper.com/) in Reading on 12 October 2019.
 
@@ -121,3 +121,10 @@ I touch on a whole range of Azure technologies, but mostly I introduce and expan
 
 ## Video of the whole talk
 <iframe width="560" height="315" src="https://www.youtube.com/embed/HZgjlTi7OiA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<br />
+## Slides
+View the slides on Slide Share:
+<iframe src="//www.slideshare.net/slideshow/embed_code/key/DbJSjU5lVqZNUN" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="//www.slideshare.net/FransLytzen/secure-your-azure-web-app-2019" title="Secure your Azure Web App 2019" target="_blank">Secure your Azure Web App 2019</a> </strong> from <strong><a href="https://www.slideshare.net/FransLytzen" target="_blank">Frans Lytzen</a></strong> </div>
+
+... or download from [GitHub](https://github.com/flytzen/SecurityTalk/blob/master/Secure%20Your%20Web%20App%20Presentation.pptx?raw=true)
