@@ -1,4 +1,206 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2019-11-27T17:28:59+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Secure your Web App in Azure at DDD14</title><link href="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html" rel="alternate" type="text/html" title="Secure your Web App in Azure at DDD14" /><published>2019-10-16T00:00:00+01:00</published><updated>2019-10-16T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14</id><content type="html" xml:base="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html">&lt;p&gt;I had the great pleasure of giving an updated version of my &lt;a href=&quot;/talks/Securing_web_apps_in_azure.html&quot;&gt;“Secure your Web App in Azure” talk&lt;/a&gt; talk at &lt;a href=&quot;https://developerdeveloperdeveloper.com/&quot;&gt;Developer Developer Developer 14&lt;/a&gt; in Reading on 12 October 2019.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2019-12-07T09:29:21+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Azure Key Vault Secrets</title><link href="https://www.lytzen.name/2019/12/07/azure-keyvault-secrets.html" rel="alternate" type="text/html" title="Azure Key Vault Secrets" /><published>2019-12-07T00:00:00+00:00</published><updated>2019-12-07T00:00:00+00:00</updated><id>https://www.lytzen.name/2019/12/07/azure-keyvault-secrets</id><content type="html" xml:base="https://www.lytzen.name/2019/12/07/azure-keyvault-secrets.html">&lt;p&gt;&lt;a href=&quot;https://azureadventcalendar.com/&quot;&gt;Azure Advent Calendar 2019&lt;/a&gt; is a great initiative to generate and share a bunch of Azure content.
+I was fortunate enough to be able to create a video about Azure Key Vault for the Advent Calendar. Specifically, this video focuses on storing &lt;em&gt;secrets&lt;/em&gt; in Azure Key Vault.&lt;/p&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/SIA3pleuqfQ&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;Please check out all the &lt;a href=&quot;https://www.youtube.com/channel/UCJL9wCcmeMBbah4J0uOWIPg&quot;&gt;other great content and subscribe to the channel&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;content&quot;&gt;Content&lt;/h1&gt;
+&lt;p&gt;The broad outline of the video is as follows:&lt;/p&gt;
+
+&lt;h2 id=&quot;what-is-azure-key-vault&quot;&gt;What is Azure Key Vault?&lt;/h2&gt;
+&lt;p&gt;Azure Key Vault provides the following, quite separate, areas of functionality:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Secrets: Safe place to store passwords and other secrets&lt;/li&gt;
+  &lt;li&gt;Keys / Cryptography: Public/Private key encryption&lt;/li&gt;
+  &lt;li&gt;Certificate Store: Safe place to store X509 certificates&lt;/li&gt;
+  &lt;li&gt;Storage Account key rotation: Essentially a wrapper around “Secrets” to help you manage and rotate you Azure Storage Account keys.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;azure-key-vault-secrets&quot;&gt;Azure Key Vault Secrets&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;Store and retrieve secrets&lt;/li&gt;
+  &lt;li&gt;Fine-grained access control
+    &lt;ul&gt;
+      &lt;li&gt;For example, write-only access to a user, read-only access to an app&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Auth is easy with Managed Identity&lt;/li&gt;
+  &lt;li&gt;Store multiple versions with stop/start dates etc
+    &lt;ul&gt;
+      &lt;li&gt;The dates are advisory and your code has to decide whether to read and use them&lt;/li&gt;
+      &lt;li&gt;Uniquely reference specific versions&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;before-you-start-with-the-examples&quot;&gt;Before you start with the examples&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest&quot;&gt;Install the Azure CLI &lt;/a&gt;&lt;br /&gt;
+&lt;em&gt;Note: I use the PowerShell line continuation character below - if you run this in bash you need to change that&lt;/em&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az login
+az account set --subscription xxxx
+az configure --defaults location=westeurope group=fl-test-keyvault
+az group create --name fl-test-keyvault
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;create-a-key-vault&quot;&gt;Create a Key Vault&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az keyvault create --name fl-test
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;give-read-and-write-permissions-to-a-user&quot;&gt;Give read and write permissions to a user&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az keyvault set-policy `
+    --name fl-test `
+    --upn &quot;flytzen@neworbit.co.uk&quot; `
+    --secret-permissions get, list, set  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In the real world, a consuming application should not have “set” and an admin shouldn’t have get&lt;/p&gt;
+
+&lt;h2 id=&quot;add-a-secret&quot;&gt;Add a secret&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;You can do this in the portal as well - and in code of course&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az keyvault secret set `
+    --name supersecretpassword `
+    --vault-name fl-test `
+    --value ohmyworditssosecret `
+    --not-before 2019-12-03T14:30:25z `
+    --expires 2019-12-24T23:59:59z `
+    --disabled false `
+    --output table
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Note that the “disabled” flag is enforced; most operations are blocked on a disabled secret.
+However, the nbf and expiry are for information and it’s up to you to read them and act on them
+This is &lt;em&gt;different&lt;/em&gt; for keys!&lt;/p&gt;
+
+&lt;h2 id=&quot;set-up-a-console-app-to-read-the-secret&quot;&gt;Set up a console app to read the secret&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Note: New packages have just come out but they have &lt;a href=&quot;https://github.com/Azure/azure-sdk-for-net/issues/8934&quot;&gt;less intuitive auth&lt;/a&gt; - for now&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;dotnet new console -n ShowSecrets 
+cd ShowSecrets 
+dotnet add package Microsoft.Azure.KeyVault
+dotnet add package Microsoft.Azure.Services.AppAuthentication
+code .
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;fields&quot;&gt;Fields&lt;/h2&gt;
+&lt;p&gt;Add the following to the top of the Main class:&lt;/p&gt;
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultUrl&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;https://fl-test.vault.azure.net&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;supersecretname&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;supersecretpassword&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;simple-program-to-retrieve-secret&quot;&gt;Simple program to retrieve secret&lt;/h2&gt;
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenProvider&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;AzureServiceTokenProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultClient&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+               &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AuthenticationCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokenProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;KeyVaultTokenCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secretValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetSecretAsync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keyVaultUrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;supersecretname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;Console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;WriteLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;change-the-secret-in-the-cli&quot;&gt;Change the secret in the CLI&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az keyvault secret set `
+    --name supersecretpassword `
+    --vault-name fl-test `
+    --value OXFORD `
+    --not-before 2019-12-24T14:30:25z `
+    --expires 2019-12-31T23:59:59z `
+    --disabled false
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;see-all-the-versions&quot;&gt;See all the versions&lt;/h2&gt;
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Task&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tokenProvider&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;AzureServiceTokenProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultClient&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+                 &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AuthenticationCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tokenProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;KeyVaultTokenCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secretVersions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetSecretVersionsAsync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keyVaultUrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;supersecretname&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;foreach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secretVersions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;secretVersionValue&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetSecretAsync&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;WriteLine&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;$&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Identifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; | &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Attributes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Enabled&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; | &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Attributes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NotBefore&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; | &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Attributes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Expires&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt; | &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;secretVersionValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;  
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;try-it-in-aspnet-core&quot;&gt;Try it in ASP.Net Core&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;dotnet new mvc
+dotnet add package Microsoft.Azure.KeyVault
+dotnet add package Microsoft.Azure.Services.AppAuthentication
+dotnet add package Microsoft.Extensions.Configuration.AzureKeyVault
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In &lt;code class=&quot;highlighter-rouge&quot;&gt;program.cs&lt;/code&gt; change:&lt;/p&gt;
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IHostBuilder&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;CreateHostBuilder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;Host&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;CreateDefaultBuilder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ConfigureWebHostDefaults&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;webBuilder&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;webBuilder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UseStartup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Startup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;ConfigureAppConfiguration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AddAzureKeyVault&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://fl-test.vault.azure.net&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                                    &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+                                        &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;KeyVaultClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;AuthenticationCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+                                            &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;AzureServiceTokenProvider&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;KeyVaultTokenCallback&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)),&lt;/span&gt;
+                                    &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;DefaultKeyVaultSecretManager&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In &lt;code class=&quot;highlighter-rouge&quot;&gt;Home/index.cshtml&lt;/code&gt; add:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@{
+   string myPassword = Configuration[&quot;supersecretpassword&quot;];
+}
+
+&amp;lt;h2&amp;gt;Retrieved from Key Vault:&amp;lt;/h2&amp;gt;
+&amp;lt;h1&amp;gt;@myPassword&amp;lt;/h1&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;Note: Directly injecting and using config in the view like this is a &lt;strong&gt;bad&lt;/strong&gt; idea. Don’t do this in the real world please.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;do-it-on-azure&quot;&gt;Do it on Azure&lt;/h1&gt;
+&lt;p&gt;This part is more about deploying to Azure and setting up Managed Identity&lt;/p&gt;
+
+&lt;h2 id=&quot;set-up-git-on-the-repository-to-make-it-easy&quot;&gt;Set up git on the repository to make it easy&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git init 
+echo &quot;bin/&quot; | out-file .gitignore -encoding utf8 
+echo &quot;obj/&quot; | out-file .gitignore -encoding utf8 -append 
+git add -A
+git commit -m &quot;Initial commit&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;create-a-web-app-slot&quot;&gt;Create a web app slot&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;Note: this won’t work in PowerShell because of the pipe symbol in “DOTNETCORE|3.0”! You need to run the &lt;code class=&quot;highlighter-rouge&quot;&gt;webapp create&lt;/code&gt; command in a command prompt or bash&lt;/em&gt;&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az appservice plan create --name fl-test-keyvault-secrets --sku S1 --is-linux  -o json
+az webapp create --name fl-test-keyvault-secrets --plan fl-test-keyvault-secrets --runtime &quot;DOTNETCORE|3.0&quot; --deployment-local-git -o json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;enable-managed-identity-and-give-it-access-to-the-key-vault&quot;&gt;Enable Managed Identity and give it access to the key vault&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az webapp identity assign --name fl-test-keyvault-secrets
+
+az keyvault set-policy `
+    --name fl-test `
+    --object-id f0e46c32-3492-407c-b31f-3e137e378ea7 `
+    --secret-permissions get, list  
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;add-azure-as-a-git-remote-so-we-can-push-to-it&quot;&gt;Add azure as a git remote so we can push to it&lt;/h2&gt;
+&lt;p&gt;The first line gets the publishing username and password for this webapp, which you’ll be prompted for when you &lt;code class=&quot;highlighter-rouge&quot;&gt;git push&lt;/code&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az webapp deployment list-publishing-credentials --name fl-test-keyvault-secrets -o json
+git remote add azure https://fl-test-keyvault-secrets.scm.azurewebsites.net/fl-test-keyvault-secrets.git
+git push -u azure master
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;check-the-result&quot;&gt;Check the result&lt;/h2&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az webapp browse --name fl-test-keyvault-secrets
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://azureadventcalendar.com/&quot;&gt;&lt;img src=&quot;/assets/Advent-Calendar7.jpg&quot; alt=&quot;Azure Advent Calendar logo&quot; /&gt;&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="Security" /><summary type="html">Use Azure Key Vault to safely store secrets and passwords in Azure</summary></entry><entry><title type="html">Secure your Web App in Azure at DDD14</title><link href="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html" rel="alternate" type="text/html" title="Secure your Web App in Azure at DDD14" /><published>2019-10-16T00:00:00+01:00</published><updated>2019-10-16T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14</id><content type="html" xml:base="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html">&lt;p&gt;I had the great pleasure of giving an updated version of my &lt;a href=&quot;/talks/Securing_web_apps_in_azure.html&quot;&gt;“Secure your Web App in Azure” talk&lt;/a&gt; talk at &lt;a href=&quot;https://developerdeveloperdeveloper.com/&quot;&gt;Developer Developer Developer 14&lt;/a&gt; in Reading on 12 October 2019.&lt;/p&gt;
 
 &lt;p&gt;A video of the whole talk is available below.&lt;/p&gt;
 
@@ -640,9 +842,4 @@ When you want to find the value for a particular Hierarchy ID for a particular n
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;You may well be able to write a SQL statement something like that, though it will definitely use a table scan - so still cache it.&lt;/p&gt;
 
-&lt;p&gt;In the case of document database with an array of Ancestor IDs, you’d need to ensure that the Ancestor ID array on the node is sorted by descent level so that you can look for configuration values in the right order (by walking up the tree).&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Databases" /><category term="Performance" /><category term="SQL" /><category term="CosmosDB" /><summary type="html">Storing hierarchies in a database is easy - but applying hierarchical security and configuration can be very difficult and a significant performance problem. Hierarchy IDs can alleviate this, at the cost of a bit more complexity at write time.</summary></entry><entry><title type="html">GDPR for Software and how Azure can help</title><link href="https://www.lytzen.name/2018/06/25/GDPR-for-software.html" rel="alternate" type="text/html" title="GDPR for Software and how Azure can help" /><published>2018-06-25T00:00:00+01:00</published><updated>2018-06-25T00:00:00+01:00</updated><id>https://www.lytzen.name/2018/06/25/GDPR-for-software</id><content type="html" xml:base="https://www.lytzen.name/2018/06/25/GDPR-for-software.html">&lt;p&gt;When you develop software, whether for other people or for running your business, there are many things you have to consider which are quite different from the things you have to do to make your business GDPR compliant.&lt;br /&gt;
-In the spring of 2018 I recorded a video with Microsoft that gives an overview of this as well looks at some of the ways in which Azure can help.&lt;/p&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/KlZhAG351Bs&quot; frameborder=&quot;0&quot; allow=&quot;autoplay; encrypted-media&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;For some more specific tips on how to lock down your software on Azure, including Managed Identity and KeyVault, see &lt;a href=&quot;/2018/04/29/securing-your-webapp-in-azure.html&quot;&gt;Securing your web app in Azure&lt;/a&gt;`&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="GDPR" /><category term="Security" /><summary type="html">A video recording I made with Microsoft about how GDPR applies to Software development and how Azure can help.</summary></entry></feed>
+&lt;p&gt;In the case of document database with an array of Ancestor IDs, you’d need to ensure that the Ancestor ID array on the node is sorted by descent level so that you can look for configuration values in the right order (by walking up the tree).&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Databases" /><category term="Performance" /><category term="SQL" /><category term="CosmosDB" /><summary type="html">Storing hierarchies in a database is easy - but applying hierarchical security and configuration can be very difficult and a significant performance problem. Hierarchy IDs can alleviate this, at the cost of a bit more complexity at write time.</summary></entry></feed>
