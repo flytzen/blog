@@ -11,6 +11,9 @@ Artificial Intelligence/Machine Learning/bots are set to fundamentally change ho
 
 I believe it's a revolution on par with the move to web and I think many people working in the industry are yet to fully realise this. If you are a business analyst, architect, developer or even a business process specialist, your world is about to be turned upside down and you will have to learn a completely new skill-set or face becoming increasingly irrelevant. 
 
+Update: I turned this article into a 10-minute lightning talk and delivered it at .Net Oxford in December 2019:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/4HeRqsIf-jA" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 You are quite likely to think I am being alarmist and you may want to dismiss what I'm saying. These could be some of the things you want to tell yourself:
 
 - A business process is a business process.   
