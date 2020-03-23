@@ -1,4 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2020-02-20T14:27:04+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Retain team members - or not</title><link href="https://www.lytzen.name/2020/02/20/retain-team-members.html" rel="alternate" type="text/html" title="Retain team members - or not" /><published>2020-02-20T00:00:00+00:00</published><updated>2020-02-20T00:00:00+00:00</updated><id>https://www.lytzen.name/2020/02/20/retain-team-members</id><content type="html" xml:base="https://www.lytzen.name/2020/02/20/retain-team-members.html">&lt;p&gt;&lt;em&gt;Disclaimer: This is not a how-to on how to retain team members by giving them free coffee or other gimmicks like that. It’s not even about retaining at all cost.&lt;/em&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.3">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2020-03-23T14:19:39+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Azure Private End Points, VPNs and multi-site</title><link href="https://www.lytzen.name/2020/03/23/private-endpoints-vpn-and-more.html" rel="alternate" type="text/html" title="Azure Private End Points, VPNs and multi-site" /><published>2020-03-23T00:00:00+00:00</published><updated>2020-03-23T00:00:00+00:00</updated><id>https://www.lytzen.name/2020/03/23/private-endpoints-vpn-and-more</id><content type="html" xml:base="https://www.lytzen.name/2020/03/23/private-endpoints-vpn-and-more.html">&lt;p&gt;&lt;em&gt;NOTE: Right now this is not a finished post - I haven’t yet figured out how to make this work. I have written it up here partially to be able to raise a support query.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;this-is-what-i-am-trying-to-achieve&quot;&gt;This is what I am trying to achieve&lt;/h1&gt;
+&lt;div style=&quot;width: 640px; height: 480px; margin: 10px; position: relative;&quot;&gt;&lt;iframe allowfullscreen=&quot;&quot; frameborder=&quot;0&quot; style=&quot;width:640px; height:480px&quot; src=&quot;https://www.lucidchart.com/documents/embeddedchart/41848683-692d-4268-bc3f-e4d9ab764098&quot; id=&quot;Pt~IQN7FkdqC&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
+
+&lt;p&gt;I have a database in the Europe North and another one in Australia East. I have users in both geographies and they need to be able to access both databases in order to write PowerBI reports. Ideally I want the users in both locations to be able to connect to a local VPN Gateway to avoid unnecessary roundtrips; at the distances we are talking about, latency becomes a real issue.&lt;/p&gt;
+
+&lt;p&gt;Until fairly recently the only way to do this was to open up the user’s IP address on the SQL Firewall. Fortunately, with the advent of Private Link / Private Endpoint, you can now connect to Azure SQL via a VPN client.&lt;/p&gt;
+
+&lt;p&gt;The complication is that that a virtual network cannot span multiple data centres, so you have to connect them using either “virtual network peering” or “virtual network gateway connections”. I have tried both and they come with different trade-offs.&lt;/p&gt;
+
+&lt;h1 id=&quot;peering&quot;&gt;Peering&lt;/h1&gt;
+&lt;p&gt;Virtual networks can be &lt;em&gt;peered&lt;/em&gt;. The setup here is based on &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-peering-gateway-transit&quot;&gt;this article&lt;/a&gt;.&lt;/p&gt;
+&lt;div style=&quot;width: 640px; height: 480px; margin: 10px; position: relative;&quot;&gt;&lt;iframe allowfullscreen=&quot;&quot; frameborder=&quot;0&quot; style=&quot;width:640px; height:480px&quot; src=&quot;https://www.lucidchart.com/documents/embeddedchart/2eb8492a-7b8b-4410-a4f8-9b386194dabc&quot; id=&quot;vC~I0fkY7VUW&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
+
+&lt;p&gt;In this setup, I have created two peerings:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;One going from Europe to Australia which has “Allow Gateway Transit” set.&lt;/li&gt;
+  &lt;li&gt;One going from Australia to Europe which has “Use Remote Gateways” set.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;what-works&quot;&gt;What works&lt;/h2&gt;
+&lt;p&gt;I can connect to the Europe Gateway and connect to the database in both locations. That is a success.&lt;/p&gt;
+
+&lt;p&gt;When I connect to the Azure VPN client, I can see in the &lt;code class=&quot;highlighter-rouge&quot;&gt;AzureVpnCxn.log&lt;/code&gt; that I get both the 10.0.0.0/16 and the 10.1.0.0/16 routes.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: route 10.0.0.0 255.255.0.0
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Assigned Route: 10.0.0.0 / 255.255.0.0
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: route 10.1.0.0 255.255.0.0
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Assigned Route: 10.1.0.0 / 255.255.0.0
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: route-gateway 172.16.10.1
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: topology subnet
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: ifconfig 172.16.10.2 255.255.255.128
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Assigned IP address: 172.16.10.2 / 255.255.255.128
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Assigned Route: 172.16.10.0 / 255.255.255.128
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00024864] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Received option: cipher AES-256-GCM
+[‎3‎/‎23‎/‎2020‎ ‎1‎:‎28‎:‎14‎ ‎PM] PId:[00025864] TId:[00010832] [momenta-live-eun] [{cd712a18-c0d7-482c-9f11-7404ad0c7b1b}] [Verbose] Session established!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;what-doesnt-work&quot;&gt;What doesn’t work&lt;/h2&gt;
+&lt;p&gt;This setup is designed for a “hub and spoke” architecture; Setting the “Use Remote Gateways” setting explicitly disallows me from having a Gateway in Australia. In other words, my Australia users have to connect to the VPN Gateway in Europe, which means they’ll suffer double latency when querying the Australia database.&lt;br /&gt;
+If you don’t set the “Use Remote Gateways” options, you won’t get the 10.1.0.0/16 route when you connect with the Azure VPN Client.&lt;/p&gt;
+
+&lt;h1 id=&quot;gateway-connection&quot;&gt;Gateway Connection&lt;/h1&gt;
+&lt;p&gt;In this setup, you use Gateway Connections between the two networks.&lt;/p&gt;
+&lt;div style=&quot;width: 640px; height: 480px; margin: 10px; position: relative;&quot;&gt;&lt;iframe allowfullscreen=&quot;&quot; frameborder=&quot;0&quot; style=&quot;width:640px; height:480px&quot; src=&quot;https://www.lucidchart.com/documents/embeddedchart/54b1279f-d5f1-4513-9e5b-a8346ab78cc6&quot; id=&quot;QD~Ipb0I~VxK&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;what-works-1&quot;&gt;What works&lt;/h2&gt;
+&lt;p&gt;I get the routes served to me, from the &lt;code class=&quot;highlighter-rouge&quot;&gt;AzureVpnCxn.log&lt;/code&gt; I get this:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: route 10.0.0.0 255.255.0.0
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Assigned Route: 10.0.0.0 / 255.255.0.0
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: route 10.1.0.0 255.255.0.0
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Assigned Route: 10.1.0.0 / 255.255.0.0
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: route-gateway 172.16.10.1
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: topology subnet
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: ifconfig 172.16.10.3 255.255.255.128
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Assigned IP address: 172.16.10.3 / 255.255.255.128
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Assigned Route: 172.16.10.0 / 255.255.255.128
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00018256] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Received option: cipher AES-256-GCM
+[‎3‎/‎20‎/‎2020‎ ‎4‎:‎51‎:‎21‎ ‎PM] PId:[00011592] TId:[00012216] [momenta-live-eun] [{7412cb8b-e91a-4757-8f1f-c32c4406248e}] [Verbose] Session established!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;This is exactly the same as when I used peerings&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;what-doesnt-work-1&quot;&gt;What doesn’t work&lt;/h2&gt;
+&lt;p&gt;When I connect to the Europe Gateway, I am &lt;em&gt;not&lt;/em&gt; able to connect to the Australia database; the connection simply times out. I suspect that the remote network is unable to respond, because:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;The Europe -&amp;gt; Australia Gateway connection shows that it has data going &lt;em&gt;out&lt;/em&gt; but 0 bytes data &lt;em&gt;in&lt;/em&gt;.&lt;/li&gt;
+  &lt;li&gt;The Australia -&amp;gt; Europe Gateway connection shows that it has data coming &lt;em&gt;in&lt;/em&gt; but 0 bytes data &lt;em&gt;out&lt;/em&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;notes&quot;&gt;Notes&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;I don’t know why you have to create two connections, one for each direction.&lt;/li&gt;
+  &lt;li&gt;You can enable &lt;code class=&quot;highlighter-rouge&quot;&gt;Border Gateway Protocol&lt;/code&gt; (BGP) on the gateways. Interestingly, if you do that, you &lt;em&gt;don’t&lt;/em&gt; get the route for the remote network when you connect to the VPN Client. Still, you can’t connect to the remote database.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;naming-and-certificates&quot;&gt;Naming and certificates&lt;/h1&gt;
+&lt;p&gt;There’s another whole set of problems about DNS names and SQL Server certificates.&lt;br /&gt;
+The SQL Server has a &lt;em&gt;public&lt;/em&gt; IP address, but Private Link also gives it a &lt;em&gt;Private&lt;/em&gt; IP address. In my example here, they are 10.0.1.4 and 10.1.1.4 respectively. When you connect to the SQL Server over the VPN, you need to use the private IP address. So you may think you can just type 10.0.1.4 into PowerBI and start connecting. You will unfortunately get an “Encryption Support” error saying “The server name provided doesn’t match the server name on the SQL Server SSL certificate”.&lt;/p&gt;
+
+&lt;p&gt;This makes sense; The SQL Server has a certificate that has been issued to &lt;code class=&quot;highlighter-rouge&quot;&gt;mydatabase.database.windows.net&lt;/code&gt; (just like a website would) and when you try to connect to &lt;code class=&quot;highlighter-rouge&quot;&gt;10.0.1.4&lt;/code&gt;, you get an error - just like you would in a web browser in the same situation…. &lt;em&gt;TO BE FINISHED&lt;/em&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="azure" /><summary type="html">Azure Private End Points, VPN clients and multi-region setups.</summary></entry><entry><title type="html">Retain team members - or not</title><link href="https://www.lytzen.name/2020/02/20/retain-team-members.html" rel="alternate" type="text/html" title="Retain team members - or not" /><published>2020-02-20T00:00:00+00:00</published><updated>2020-02-20T00:00:00+00:00</updated><id>https://www.lytzen.name/2020/02/20/retain-team-members</id><content type="html" xml:base="https://www.lytzen.name/2020/02/20/retain-team-members.html">&lt;p&gt;&lt;em&gt;Disclaimer: This is not a how-to on how to retain team members by giving them free coffee or other gimmicks like that. It’s not even about retaining at all cost.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;Many years ago I worked for a small company that was bought by Microsoft.&lt;br /&gt;
 One day we had an employee survey - one of the questions on it was “Do you intend to work for Microsoft until you retire”. Most of our newly-bought business said no and, predictably, we had a report back from corp that highlighted this as a potential morale problem in our area.
@@ -670,141 +751,4 @@ Alternatively, if you only have a single tenant, just do:&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az role assignment create --role &quot;Owner&quot; --assignee foo@bar.com --scope /subscriptions/11111111-1111-1111-1111-111111111111
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Copy those lines into your console and shortly after your new user will be an owner of all your subscriptions.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="DevOps" /><category term="Azure" /><summary type="html">Add a new user to all my Azure subscriptions using Azure CLI</summary></entry><entry><title type="html">Publish Nuget packages with Azure Dev Ops</title><link href="https://www.lytzen.name/2018/10/03/publish-nuget-packages-with-azure-devops.html" rel="alternate" type="text/html" title="Publish Nuget packages with Azure Dev Ops" /><published>2018-10-03T00:00:00+01:00</published><updated>2018-10-03T00:00:00+01:00</updated><id>https://www.lytzen.name/2018/10/03/publish-nuget-packages-with-azure-devops</id><content type="html" xml:base="https://www.lytzen.name/2018/10/03/publish-nuget-packages-with-azure-devops.html">&lt;p&gt;Whenever I decide to create a Nuget package, whether for OSS or to publish on our internal MyGet feed I end up spending an inordinate amount of time trying to figure out a flow that works for testing and publishing. I guess it’s one of those things that, once you have figured it out, becomes easy but it has eluded me until recently.&lt;/p&gt;
-
-&lt;p&gt;My requirements are quite specific and may not be to everyone’s liking;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;I want to use &lt;a href=&quot;https://datasift.github.io/gitflow/IntroducingGitFlow.html&quot;&gt;GitFlow&lt;/a&gt; to control my branches, including using Pull Requests etc.&lt;/li&gt;
-  &lt;li&gt;Whenever a commit is made to &lt;code class=&quot;highlighter-rouge&quot;&gt;develop&lt;/code&gt; (or a PR is merged in), I want to publish that package with a “&lt;code class=&quot;highlighter-rouge&quot;&gt;-pre.123&lt;/code&gt;” suffix as per &lt;a href=&quot;https://semver.org/&quot;&gt;SemVer&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;Whenever the same happens to &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; I want to publish a “full” release.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I haven’t explicitly covered it here, but it would also be nice to have packages sat in a &lt;code class=&quot;highlighter-rouge&quot;&gt;release/*&lt;/code&gt; branch be published with a &lt;code class=&quot;highlighter-rouge&quot;&gt;-beta.1&lt;/code&gt; suffix - but you can easily extend it to cover that scenario as well.&lt;/p&gt;
-
-&lt;p&gt;In this post I will show how to set up GitHub with Azure DevOps to do this for us.&lt;/p&gt;
-
-&lt;p&gt;I am basing this on “modern” (i.e. 2017) csproj files, the ones where the package references are in the .csproj files. This came in with .Net Core but works fine with Full Framework projects.&lt;/p&gt;
-
-&lt;h2 id=&quot;version-numbers&quot;&gt;Version numbers&lt;/h2&gt;
-&lt;p&gt;When you create and publish Nuget packages you can specify the version number you want to use on the command line and there is ample of documentation about how to do that with Azure DevOps and other builder services, including MyGet build services, which I used previously.&lt;br /&gt;
-However, I really like more control so I like to control the version number in my .csproj file - but I want the build service to automatically append &lt;code class=&quot;highlighter-rouge&quot;&gt;-pre.nnn&lt;/code&gt; when it published from the &lt;code class=&quot;highlighter-rouge&quot;&gt;develop&lt;/code&gt; branch.&lt;/p&gt;
-
-&lt;p&gt;The first thing to understand is that there are two ways you can specify the version number in your &lt;code class=&quot;highlighter-rouge&quot;&gt;.csproj&lt;/code&gt; file:&lt;/p&gt;
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.3-pre.987&lt;span class=&quot;nt&quot;&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;or&lt;/p&gt;
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionPrefix&amp;gt;&lt;/span&gt;1.2.3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/VersionPrefix&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionSuffix&amp;gt;&lt;/span&gt;pre.987&lt;span class=&quot;nt&quot;&gt;&amp;lt;/VersionSuffix&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Both the above will create packages with version &lt;code class=&quot;highlighter-rouge&quot;&gt;1.2.3-pre.987&lt;/code&gt;. The naming of the Prefix and Suffix threw me for the longest time - I thought they were meant to interact with the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;Version&amp;gt;&lt;/code&gt; attribute somehow, but Prefix and Suffix is more like “main part” and “extra bit” and you should &lt;em&gt;either&lt;/em&gt; those &lt;em&gt;or&lt;/em&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;Version&amp;gt;&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The second thing to understand is that you can use conditionals and environment variables in the attributes. 
-For my purposes, this is what I ended up with:&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionPrefix&amp;gt;&lt;/span&gt;1.2.3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/VersionPrefix&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionSuffix&amp;gt;&amp;lt;/VersionSuffix&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionSuffix&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Condition=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; '$(Configuration)' == 'Debug' &quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;debug&lt;span class=&quot;nt&quot;&gt;&amp;lt;/VersionSuffix&amp;gt;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- For local/debug builds --&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;VersionSuffix&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;Condition=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; '$(Build_SourceBranch)' == 'refs/heads/develop' &quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;pre.$(Build_BuildID)&lt;span class=&quot;nt&quot;&gt;&amp;lt;/VersionSuffix&amp;gt;&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- This is using variables that are specific to Azure Dev Ops Pipelines --&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;My &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;VersionPrefix&amp;gt;&lt;/code&gt; here is really the proper version I want my package to have.&lt;br /&gt;
-I have an empty &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;VersionSuffix&amp;gt;&lt;/code&gt; as default. I probably don’t actually need that tag, but it helps make it clearer in my mind.&lt;/p&gt;
-
-&lt;p&gt;The next &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;VersionSuffix&amp;gt;&lt;/code&gt; uses the &lt;code class=&quot;highlighter-rouge&quot;&gt;Configuration&lt;/code&gt; variable that is provided by the dotnet build process; if I build in Debug mode, the package version will become &lt;code class=&quot;highlighter-rouge&quot;&gt;1.2.3-debug&lt;/code&gt;. This is mainly useful for local scenarios as I will always build in Release mode for publishing.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;VersionSuffix&amp;gt;&lt;/code&gt; after that looks at an environment variable provided by Azure DevOps when you are running in the pipeline. This means that if I am building from the &lt;code class=&quot;highlighter-rouge&quot;&gt;develop&lt;/code&gt; branch in an Azure Pipeline then it will set the Suffix. &lt;code class=&quot;highlighter-rouge&quot;&gt;Build_BuildID&lt;/code&gt; is another environment variable provided by Azure Dev Ops to the pipeline, which will always increment. So, in the example here I may end up with a version number of &lt;code class=&quot;highlighter-rouge&quot;&gt;1.2.3-pre.6239&lt;/code&gt;. As long as that last number reliably increments (which it does) you are fine for package control.&lt;br /&gt;
-There is another variable called &lt;code class=&quot;highlighter-rouge&quot;&gt;Build_BuildNumber&lt;/code&gt; which you may be tempted to use instead. However, I found some scenarios where that variable would have the name of the pipeline instead of a number, which causes the build to fail.&lt;/p&gt;
-
-&lt;p&gt;For more advanced scenarios you can invent your own attributes, which become variables in their own right, which you can then re-combine in other ways.&lt;/p&gt;
-
-&lt;h2 id=&quot;publish-symbols&quot;&gt;Publish Symbols&lt;/h2&gt;
-&lt;p&gt;Traditionally, when you create a Nuget package, it &lt;em&gt;won’t&lt;/em&gt; include the &lt;code class=&quot;highlighter-rouge&quot;&gt;pdb&lt;/code&gt; files (the debug symbols). In the past, the answer was to &lt;code class=&quot;highlighter-rouge&quot;&gt;--include-symbols&lt;/code&gt; when building your Nuget pacakge. This will create &lt;em&gt;two&lt;/em&gt; Nuget packages, one with the &lt;code class=&quot;highlighter-rouge&quot;&gt;pdb&lt;/code&gt; files and one without. Up until a few years ago, you could publish both of these together to Nuget, but then that changed and now you have to publish the symbols package to a different server with a different API key and a different command. It becomes a real headache, especially because of the inconsistent and out of date documentation. Hence why I have included it in this guide; I either need to tell you how to publish symbols from within the pipeline or tell you how to avoid it.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/dotnet/sourcelink&quot;&gt;SourceLink&lt;/a&gt; to the rescue. SourceLink provides a way to link your package to a specific commit on, say, GitHub or elsewhere. I do recommend using SourceLink as it does so much more than just give you the PDB file - but even if you can’t or won’t, there is a gem hidden in the documentation, namely this line to add to your &lt;code class=&quot;highlighter-rouge&quot;&gt;.csproj&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;AllowedOutputExtensionsInPackageBuildOutputFolder&amp;gt;&lt;/span&gt;
-  $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/AllowedOutputExtensionsInPackageBuildOutputFolder&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;What this will do is include the &lt;code class=&quot;highlighter-rouge&quot;&gt;pdb&lt;/code&gt; file in your main Nuget package, meaning you don’t need a separate symbols package at all. Of course, using the full SourceLink is much better. Incidentally, this also works for private repos without sharing the source publicly.&lt;/p&gt;
-
-&lt;h2 id=&quot;variables&quot;&gt;Variables&lt;/h2&gt;
-&lt;p&gt;When you are looking at the documentation for Azure DevOps there are lists of variables scattered in different places. You will probably also find that the same variable in some context is referred to as Build.BuildId and in another as BUILD_BUILDID etc. Sometimes you have to reference it as %BUILD_BUILDID%, other times as $(Build.BuildId) and yet other times as $(Build_BuildID). It does sort of make sense, but as a good starting point, when designing your YAML file, I recommend adding this task somewhere:&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;set&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;show variables&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;It just dumps all the environment variables to the log, so you can have a look through to see what is actually available for you to reference.&lt;/p&gt;
-
-&lt;h2 id=&quot;setting-up-a-pipeline&quot;&gt;Setting up a pipeline.&lt;/h2&gt;
-&lt;p&gt;The easiest way to set up a build pipeline on Azure DevOps from GitHub is to add the &lt;a href=&quot;https://github.com/marketplace/azure-pipelines&quot;&gt;Azure Pipelines&lt;/a&gt; GitHub App to your Github account. When you connect it to a repository, it will walk you through setting up a default pipeline; just choose the “empty” option. This pipeline will save a YAML file into your repository and will set up two triggers. One is a simple trigger to run the pipeline for any commit on any branch, the other is a specific integration into Pull Requests; essentially any pull request will be run through the pipeline and if it fails it will block the PR from being merged.&lt;/p&gt;
-
-&lt;p&gt;This is the YAML file I ended up:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;# This only runs for master and develop. Plus a seperate trigger is run for PR validation. This means commits to branches not in a PR won't get tested. Choices, choices...&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NewOrbit.NewOrbit.AddOne - build and test&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;trigger&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;master&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;develop&lt;/span&gt;
-
-&lt;span class=&quot;na&quot;&gt;variables&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;buildConfiguration&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Release&lt;/span&gt;
-
-&lt;span class=&quot;na&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;vmImage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;vs2017-win2016'&lt;/span&gt;
-
-&lt;span class=&quot;na&quot;&gt;steps&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;set&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;show variables&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;dotnet restore&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;dotnet restore&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;dotnet build --configuration $(buildConfiguration) --no-restore&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;build&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DotNetCoreCLI@2&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;test&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;command&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;test&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;projects&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;**/*tests/*.csproj'&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;arguments&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;--configuration&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;$(buildConfiguration)'&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;script&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;dotnet pack --configuration $(buildConfiguration) --no-build --output %Build_ArtifactStagingDirectory%&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;and(succeeded(), or(eq(variables['Build.SourceBranchName'], 'master'),eq(variables['Build.SourceBranchName'], 'develop')))&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pack&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NuGetCommand@2&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;displayName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;publish&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;and(succeeded(), or(eq(variables['Build.SourceBranchName'], 'master'),eq(variables['Build.SourceBranchName'], 'develop')))&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;command&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;push&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;nuGetFeedType&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;external&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;publishFeedCredentials&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NewOrbit&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;MyGet&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Nuget'&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;packagesToPush&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;$(Build.ArtifactStagingDirectory)/**/*.nupkg'&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;trigger&lt;/code&gt; part limits this to only run on checkins to &lt;code class=&quot;highlighter-rouge&quot;&gt;develop&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; (note, some of the documentation has a more verbose syntax that seems to not work). The Pull Request trigger still works so all Pull Request and all commits into an open Pull Request will be run through this pipeline. But, for me, I don’t need CI to run on every commit on every feature branch. That’s just me - if you want the pipeline to run for every commit, just delete the &lt;code class=&quot;highlighter-rouge&quot;&gt;trigger&lt;/code&gt; section altogether.&lt;/p&gt;
-
-&lt;p&gt;The steps through restore and build should be obvious. The step after that uses a special Azure DevOps task to run the unit tests, which ensures that the results are reported in a nice way in the pipeline.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;script: dotnet pack&lt;/code&gt; packs the Nuget package and outputs the package to a particular holding area. To be honest, I could probably forgo the &lt;code class=&quot;highlighter-rouge&quot;&gt;output&lt;/code&gt; parameter but it helps to understand what is going on.&lt;br /&gt;
-The key thing here is the &lt;code class=&quot;highlighter-rouge&quot;&gt;condition&lt;/code&gt; line. This will ensure that a Nuget package is &lt;em&gt;only&lt;/em&gt; created if the build is of either the develop or the master branch. If you wanted to publish “beta” versions from &lt;code class=&quot;highlighter-rouge&quot;&gt;release/*&lt;/code&gt; branches, it should be straight forward to extend the condition accordingly.&lt;br /&gt;
-Incidentally, there is an Azure DevOps task for creating the Nuget package but I couldn’t get it to work so used &lt;code class=&quot;highlighter-rouge&quot;&gt;dotnet pack&lt;/code&gt; instead.&lt;/p&gt;
-
-&lt;p&gt;The final task publishes the created nuget package to Nuget. In this case I am publishing it to Myget; In order to do this, you first need to go to your &lt;em&gt;project&lt;/em&gt; in Azure DevOps, go to Project Settings and then select Service Connections (it’s well hidden). Then add a connection to Nuget or MyGet or whatever Nuget feed you want to publish to. You put the &lt;em&gt;name&lt;/em&gt; of that service connection in the &lt;code class=&quot;highlighter-rouge&quot;&gt;publishFeedCredentials&lt;/code&gt; property in the YAML file.&lt;/p&gt;
-
-&lt;p&gt;if you wanted to publish packages from your develop branch to MyGet and the ones from Master to NuGet you can hopefully see how you can just duplicate the last task and change the &lt;code class=&quot;highlighter-rouge&quot;&gt;condition&lt;/code&gt; statements to suit your needs.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;NOTE&lt;/strong&gt; There is a bug in Azure DevOps that may result in an error saying something like that your pipeline doesn’t have the right permissiom to use the service connection. It’s easy to fix by following the guidance &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/devops/pipelines/process/resources?view=vsts&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;approvals&quot;&gt;Approvals&lt;/h2&gt;
-&lt;p&gt;The approach described above will publish packages immediately. If you wanted, you can easily set it up so you have to manually approve the publish. In short, you need to replace the final publish task in the YAML above with a Publish Artifacts task.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PublishBuildArtifacts@1&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;artifactName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;package'&lt;/span&gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;This will copy whatever is in the &lt;code class=&quot;highlighter-rouge&quot;&gt;%Build_ArtifactStagingDirectory%&lt;/code&gt; directory (where we put the Nuget package before) and make it available as an artefact of the build. Once you run the pipeline, look at the build and you will see an Artefact. If you click on that, Azure DevOps will take you through a wizard to set up a release pipeline, which you can then use to add manual approval before you publish the package to Nuget.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="DevOps" /><category term="Azure" /><summary type="html">Use GitFlow and Azure Devops to automatically publish Nuget packages with sensible version numbers</summary></entry></feed>
+&lt;p&gt;Copy those lines into your console and shortly after your new user will be an owner of all your subscriptions.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="DevOps" /><category term="Azure" /><summary type="html">Add a new user to all my Azure subscriptions using Azure CLI</summary></entry></feed>
