@@ -4,7 +4,7 @@ title: Azure Private End Points, VPNs and multi-site
 date: '2020-03-23'
 author: Frans Lytzen
 tags: azure
-modified_time: '2020-03-23'
+modified_time: '2020-03-26'
 excerpt: Azure Private End Points, VPN clients and multi-region setups.
 ---
 *NOTE: Right now this is not a finished post - I haven't yet figured out how to make this work. I have written it up here partially to be able to raise a support query.*
@@ -86,4 +86,13 @@ When I connect to the Europe Gateway, I am *not* able to connect to the Australi
 There's another whole set of problems about DNS names and SQL Server certificates.  
 The SQL Server has a *public* IP address, but Private Link also gives it a *Private* IP address. In my example here, they are 10.0.1.4 and 10.1.1.4 respectively. When you connect to the SQL Server over the VPN, you need to use the private IP address. So you may think you can just type 10.0.1.4 into PowerBI and start connecting. You will unfortunately get an "Encryption Support" error saying "The server name provided doesn't match the server name on the SQL Server SSL certificate".  
 
-This makes sense; The SQL Server has a certificate that has been issued to `mydatabase.database.windows.net` (just like a website would) and when you try to connect to `10.0.1.4`, you get an error - just like you would in a web browser in the same situation.... *TO BE FINISHED*
+This makes sense; The SQL Server has a certificate that has been issued to `mydatabase.database.windows.net` (just like a website would) and when you try to connect to `10.0.1.4`, you get an error - just like you would in a web browser in the same situation.
+
+I am preparing a longer post on it, but the short version is this:
+`mydatabase.database.windows.net` is just a CNAME that points to `mydatabase.privatelink.database.windows.net`.
+You need to override the DNS resolution for the latter in your in your local DNS and then you can just connect to `mydatabase.database.windows.net`.  
+
+I haven't (yet) been able to show that you can override the `privatelink` entry in your HOSTS file and make it work; I am not sure it participates in the DNS chain in the same way. If you need to use a HOSTS file, you may need to override `mydatabase.database.windows.net`. More testing coming...
+
+ Azure has support for Private DNS Zones - I am not sure they are applied to VPN clients yet. I'll test and update this post when I know.
+
