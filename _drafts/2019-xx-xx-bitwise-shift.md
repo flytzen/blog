@@ -18,7 +18,7 @@ buffer[1] = s_encode32Chars[(int)(id >> 55) & 31];
 ```
 It's not really got anything to do with what the article was about, but it really annoyed me that I couldn't follow the code example, so I made it my mission to figure it out (i.e. ask my friend Phil who explained it to me).
 
-In short, that code is part of some code that shops the bits from a `long` into 5-bit long segments, converts those five bits to an integer and then uses that to look up a character in another string to use for encoding it. I'll write a simple version that uses 4 bits later in this post, i.e. to convert a number to a hex string (in a stupid way, just to show the principle :).
+In short, that code is part of some code that chops the bits from a `long` into 5-bit long segments, converts those five bits to an integer and then uses that to look up a character in another string to use for encoding it. I'll write a simple version that uses 4 bits later in this post, i.e. to convert a number to a hex string (in a stupid way, just to show the principle :).
 
 *Note: I have used [LinqPad](https://www.linqpad.net/) for the examples, so when you see special syntax like `.Dump()` in the examples then it just means I'm telling LinqPad to write the value to the console.*
 

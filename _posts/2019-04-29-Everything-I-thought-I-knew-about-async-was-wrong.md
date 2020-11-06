@@ -13,6 +13,8 @@ As soon as I began writing the code to prove the things I knew - it turned out t
 
 The presentation and the code samples [are on GitHub](https://github.com/flytzen/Async.Presentation) and I have also recorded it as a video. For practical reasons, the video was recorded in five parts; you can see them all [in one playlist](https://www.youtube.com/watch?v=UzVMzBEpuJg&list=PLbwbf2ZiIT4N7G08GcCd1Z64N8tfgKfIn) or see the individual parts below.
 
+**UPDATE**: I have published a micro library to make it easy to run async actions in parallel as discussed in the "Tips" section below. Introducing [SafeParallelAsync ](https://github.com/NewOrbit/SafeParallelAsync).
+
 ## Part 1 - Introduction
 There are lots of reasons to use async - some of them are true, others are not. In the introduction we have a quick look at these.
 
