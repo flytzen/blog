@@ -3,7 +3,7 @@ layout: post
 title: Azure Private End Points, VPNs and multi-site
 date: '2020-03-23'
 author: Frans Lytzen
-tags: azure
+tags: Azure
 modified_time: '2020-03-26'
 excerpt: Azure Private End Points, VPN clients and multi-region setups.
 ---

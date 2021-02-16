@@ -3,7 +3,7 @@ layout: post
 title: Retain team members - or not
 date: '2020-02-20'
 author: Frans Lytzen
-tags: management
+tags: Management
 modified_time: '2020-02-20'
 excerpt: Another way to think about the relationship between your company and your employees.
 ---

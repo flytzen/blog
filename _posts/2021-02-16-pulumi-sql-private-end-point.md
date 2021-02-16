@@ -3,7 +3,7 @@ layout: post
 title: Azure SQL Private End Points with Pulumi
 date: '2021-02-16'
 author: Frans Lytzen
-tags: azure pulumi network
+tags: Azure Pulumi Network Security
 modified_time: '2021-02-16'
 excerpt: Configure Private End Points on Azure SQL Server with Pulumi
 ---
