@@ -18,23 +18,23 @@ Application Insights is built on top of Log Analytics and uses the same engine f
 
 # Switching on Diagnostics
 We created a new Log Analytics workspace and then told CosmosDB to log all requests to that workspace:
-![Diagnostic Settings](../assets/loganalytics/diagnosticsettings.png)
+![Diagnostic Settings](/assets/loganalytics/diagnosticsettings.png)
 
 # Analysing the data
 After waiting an hour to get some data to work with, we wrote a few queries:
 
 ## Who is sending most requests?
-![Request Count](../assets/loganalytics/numrequests.png)
+![Request Count](/assets/loganalytics/numrequests.png)
 
 We can see that Power BI is responsible for about 11% of the requests. Not too bad, but still quite high.
 
 ## Who is using the most Request Units?
-![Request Units](../assets/loganalytics/requestunits.png)
+![Request Units](/assets/loganalytics/requestunits.png)
 
 Wow, so PowerBI is using ~70% of the total capacity on CosmosDB. That is definitely a problem.
 
 ## How often is PowerBI making requests?
-![Requests per minute](../assets/loganalytics/requestperminute.png)
+![Requests per minute](/assets/loganalytics/requestperminute.png)
 
 The client told us that they have a number of PowerBI reports that auto refresh - but they are not supposed to refresh very often. Despite that, we can see that PowerBI makes more than 250 requests per minute so something is amiss.
 

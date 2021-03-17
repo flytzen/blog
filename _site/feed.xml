@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2021-03-17T08:38:59+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Log Analytics to the rescue</title><link href="https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue.html" rel="alternate" type="text/html" title="Log Analytics to the rescue" /><published>2021-03-17T00:00:00+00:00</published><updated>2021-03-17T00:00:00+00:00</updated><id>https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue</id><content type="html" xml:base="https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue.html">&lt;p&gt;TL;DR; You can log all the request to Azure CosmosDB to Log Analytics so you can analyse where the requests are coming from.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2021-03-17T08:48:38+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Log Analytics to the rescue</title><link href="https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue.html" rel="alternate" type="text/html" title="Log Analytics to the rescue" /><published>2021-03-17T00:00:00+00:00</published><updated>2021-03-17T00:00:00+00:00</updated><id>https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue</id><content type="html" xml:base="https://www.lytzen.name/2021/03/17/log-analytics-to-the-rescue.html">&lt;p&gt;TL;DR; You can log all the request to Azure CosmosDB to Log Analytics so you can analyse where the requests are coming from.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Background&lt;/strong&gt;: One of the systems we build and run on Azure for one of our clients, we had a problem when deploying a new version. As soon as the new version was deployed, performance would fall to unusable levels. We could not reproduce this in any test environments, it only happened in live. We figured out that the problem was most likely caused by the CosmosDB running at capacity and something in the new release just added a tiny bit of extra load that tipped it over the edge. We could see in Azure that the CosmosDB was running at 80%-100% utilisation, though with a very low level of throttling.&lt;/p&gt;
 
@@ -8,23 +8,23 @@
 
 &lt;h1 id=&quot;switching-on-diagnostics&quot;&gt;Switching on Diagnostics&lt;/h1&gt;
 &lt;p&gt;We created a new Log Analytics workspace and then told CosmosDB to log all requests to that workspace:
-&lt;img src=&quot;../assets/loganalytics/diagnosticsettings.png&quot; alt=&quot;Diagnostic Settings&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/assets/loganalytics/diagnosticsettings.png&quot; alt=&quot;Diagnostic Settings&quot; /&gt;&lt;/p&gt;
 
 &lt;h1 id=&quot;analysing-the-data&quot;&gt;Analysing the data&lt;/h1&gt;
 &lt;p&gt;After waiting an hour to get some data to work with, we wrote a few queries:&lt;/p&gt;
 
 &lt;h2 id=&quot;who-is-sending-most-requests&quot;&gt;Who is sending most requests?&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&quot;../assets/loganalytics/numrequests.png&quot; alt=&quot;Request Count&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/loganalytics/numrequests.png&quot; alt=&quot;Request Count&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We can see that Power BI is responsible for about 11% of the requests. Not too bad, but still quite high.&lt;/p&gt;
 
 &lt;h2 id=&quot;who-is-using-the-most-request-units&quot;&gt;Who is using the most Request Units?&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&quot;../assets/loganalytics/requestunits.png&quot; alt=&quot;Request Units&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/loganalytics/requestunits.png&quot; alt=&quot;Request Units&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Wow, so PowerBI is using ~70% of the total capacity on CosmosDB. That is definitely a problem.&lt;/p&gt;
 
 &lt;h2 id=&quot;how-often-is-powerbi-making-requests&quot;&gt;How often is PowerBI making requests?&lt;/h2&gt;
-&lt;p&gt;&lt;img src=&quot;../assets/loganalytics/requestperminute.png&quot; alt=&quot;Requests per minute&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/loganalytics/requestperminute.png&quot; alt=&quot;Requests per minute&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The client told us that they have a number of PowerBI reports that auto refresh - but they are not supposed to refresh very often. Despite that, we can see that PowerBI makes more than 250 requests per minute so something is amiss.&lt;/p&gt;
 
