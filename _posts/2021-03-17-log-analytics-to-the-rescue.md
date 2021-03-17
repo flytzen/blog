@@ -1,10 +1,10 @@
 ---
 layout: post
-title: Log Analytics to the rescure
-date: '2020-03-17'
+title: Log Analytics to the rescue
+date: '2021-03-17'
 author: Frans Lytzen
 tags: azure
-modified_time: '2019-03-06'
+modified_time: '2021-03-17'
 excerpt: I love Application Insights, but sometimes you need to go a bit deeper
 ---
 
