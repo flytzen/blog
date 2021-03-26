@@ -7,6 +7,8 @@ tags: DevOps Azure
 modified_time: '2018-10-03'
 excerpt: Use GitFlow and Azure Devops to automatically publish Nuget packages with sensible version numbers
 ---
+> Update: Do NOT use Build.Id as part of your version number. .Net limits the revision number to max 65535 but the Build.Id can be bigger, which may cause your build to all of a sudden start to fail.
+
 Whenever I decide to create a Nuget package, whether for OSS or to publish on our internal MyGet feed I end up spending an inordinate amount of time trying to figure out a flow that works for testing and publishing. I guess it's one of those things that, once you have figured it out, becomes easy but it has eluded me until recently.  
 
 My requirements are quite specific and may not be to everyone's liking;
