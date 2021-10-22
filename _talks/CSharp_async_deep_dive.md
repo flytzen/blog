@@ -2,7 +2,8 @@
 layout: talksummary
 title: C# Async Deep Dive
 tags: C#
-excerpt: Async in C# doesn't work how you think it does
+excerpt: Everything I thought I knew about async in C# was wrong
+sequence: 30
 ---
 This is not yet another session on how to use async/await. You are probably already using that so we won't bore each other with the syntax. Instead we shall be diving deep into how Async actually works and having a look at the benefits and pitfalls.  
 

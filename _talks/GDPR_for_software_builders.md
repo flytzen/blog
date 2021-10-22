@@ -3,9 +3,10 @@ layout: talksummary
 title: GDPR for software builders
 tags: GDPR
 excerpt: In this lightning talk, I will highlight the key areas that you need to consider in your software - even if you *think* you don't store personal data.
+sequence: 81
 ---
 
-The new General Data Protection Regulations came into effect on 25 May 2018.
+The General Data Protection Regulations came into effect on 25 May 2018.
 
 In this lightning talk, I will highlight the key areas that you need to consider in your software - even if you *think* you don't store personal data.
 

@@ -3,6 +3,7 @@ layout: talksummary
 title: Running SQL Azure at scale without a DBA
 tags: Azure
 excerpt: SQL Azure uses machine learning and sophisticated algorithms to provide you a "DBA in a box" that monitors your SQL database 24x7, automatically optimising performance and monitoring for security threats in real-time.
+sequence: 90
 ---
 SQL Azure uses machine learning and sophisticated algorithms to provide you a "DBA in a box" that monitors your SQL database 24x7, automatically optimising performance and monitoring for security threats in real-time.
 

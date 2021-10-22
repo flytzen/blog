@@ -5,11 +5,13 @@ permalink: /talks/
 ---
 I give regular talks on a number of topics at various events. If you would like me to talk at an event, please contact me on [Twitter](https://www.twitter.com/flytzen) or [email](mailto:flytzen@neworbit.co.uk).
 
-See below for [talk outlines](#talk-outlines), [speaker profile](#speaker-profiles) as well as [past and future talks](#past--future-talks).
+See below for [talk outlines](#talk-outlines), [speaker profile](#speaker-profiles) as well as [past and future talks](#past--future-talks).  
+Video examples of talks are [here](https://youtu.be/0y-Xqsrr_kA) and [here](https://youtu.be/4HeRqsIf-jA).
 
 ## Talk Outlines
 
-{% for talk in site.talks %}
+{% assign sorted_talks = site.talks | sort: 'sequence' %}
+{% for talk in sorted_talks %}
   {% include card.html type="simple" title=talk.title url=talk.url excerpt=talk.excerpt cta="Read Outline" %}
 {% endfor %}
 
