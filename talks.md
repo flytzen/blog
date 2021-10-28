@@ -18,7 +18,7 @@ Video examples of talks are [here](https://youtu.be/0y-Xqsrr_kA) and [here](http
 ## Speaker Profiles
 
 ### Short Profile
-CTO and CISO at NewOrbit; architecting and implementing large and small-scale software for our customers, all running on Azure.
+CTO and CISO at [NewOrbit](https://www.neworbit.co.uk); architecting and implementing large and small-scale software on Azure.
 
 ***
 
@@ -27,9 +27,9 @@ Moving software to the cloud since 2006.
 
 CTO and CISO at [NewOrbit](https://www.neworbit.co.uk); architecting and implementing large and small-scale software for our customers, all running on Microsoft Azure.
 
-Helping other companies move to Azure as part of our Gold Cloud Partnership with Microsoft.
+Helping other development organisations [make the most of Azure](https://neworbit.co.uk/azure/) through being an Azure Gold Partner and Reseller ("Direct CSP" in the parlance).
 
-Obsessed with security and excited by how much easier Azure makes it to be GDPR compliant.
+Obsessed with security, performance and scalability. Also, penny-pincher in the cloud.
 
 [Download Headshot](/assets/franslytzenpicture.jpg){:.button}
 
