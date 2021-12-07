@@ -718,8 +718,12 @@ td, th {
   margin-left: 2.4rem; }
 .post__content blockquote {
   font-style: italic;
-  margin-left: 1.6rem;
-  margin-right: 1.6rem; }
+  margin-left: 2.4rem;
+  margin-right: 2.4rem;
+  border: #cbcbcb 1px solid;
+  border-radius: 4px;
+  padding: 0.8rem;
+  box-shadow: 4px 4px 3px #d2d2d2; }
 .post__content pre, .post__content .highlighter-rouge .highlight {
   background: #dedede; }
 .post__content pre {

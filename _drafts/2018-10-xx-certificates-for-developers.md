@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Certificate basics for developers
-date: '2018-10-xx'
+date: '2018-10-01'
 author: Frans Lytzen
 tags: Basics
 modified_time: '2018-10-xx'
