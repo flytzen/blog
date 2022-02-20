@@ -19,6 +19,7 @@
 		, "dbaeumer.vscode-eslint"
 		, "ms-edgedevtools.vscode-edge-devtools"
 		, "sissel.shopify-liquid"
+		, "znck.grammarly"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

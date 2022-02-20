@@ -1,4 +1,56 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2021-12-07T17:51:47+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Migrate to the Cloud</title><link href="https://www.lytzen.name/2021/10/21/migrate-to-the-cloud.html" rel="alternate" type="text/html" title="Migrate to the Cloud" /><published>2021-10-21T00:00:00+01:00</published><updated>2021-10-21T00:00:00+01:00</updated><id>https://www.lytzen.name/2021/10/21/migrate-to-the-cloud</id><content type="html" xml:base="https://www.lytzen.name/2021/10/21/migrate-to-the-cloud.html">&lt;p&gt;I gave a talk aimed at CTO’s and technical decision-makers at a Leaders in Tech meetup in Reading in September 2019. I realised I hadn’t posted about it before, but I have shared the video many times, and it continues to hit home with technical decision-makers, whether you are already in the Cloud or still planning to move - and whichever Cloud platform you prefer.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-02-20T19:19:24+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Designing for scale in the cloud 101</title><link href="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html" rel="alternate" type="text/html" title="Designing for scale in the cloud 101" /><published>2022-02-20T00:00:00+00:00</published><updated>2022-02-20T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud</id><content type="html" xml:base="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html">&lt;p&gt;Having spent more than a decade designing and building systems in the Cloud there are two basic things I almost always use queues and multiple “databases”. This is very simple to do, yet can massively increase both scale and resilience.&lt;/p&gt;
+
+&lt;p&gt;I gave a 15-minute Lightning Talk at &lt;a href=&quot;https://www.dotnetoxford.com/posts/2022-02-lightning-talks&quot;&gt;.Net Oxford&lt;/a&gt; in February 2022 that explains this.&lt;/p&gt;
+
+&lt;h1 id=&quot;video&quot;&gt;Video&lt;/h1&gt;
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/FUCAsAHvbFo&quot; title=&quot;YouTube video player&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h1 id=&quot;slides&quot;&gt;Slides&lt;/h1&gt;
+&lt;iframe src=&quot;//www.slideshare.net/slideshow/embed_code/key/ay844F2Ttr6ovx&quot; width=&quot;595&quot; height=&quot;485&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; style=&quot;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&quot; allowfullscreen=&quot;&quot;&gt; &lt;/iframe&gt;
+&lt;div style=&quot;margin-bottom:5px&quot;&gt; &lt;strong&gt; &lt;a href=&quot;//www.slideshare.net/FransLytzen/designing-for-scale-and-resilience-in-the-cloud-101&quot; title=&quot;Designing for scale and resilience in the cloud 101&quot; target=&quot;_blank&quot;&gt;Designing for scale and resilience in the cloud 101&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&quot;//www.slideshare.net/FransLytzen&quot; target=&quot;_blank&quot;&gt;Frans Lytzen&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;
+
+&lt;h1 id=&quot;summary&quot;&gt;Summary&lt;/h1&gt;
+&lt;p&gt;When thinking about developing an application for deployment in the Cloud, be it Azure, AWS or Google, many people fall into one of two camps:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Just do what you normally do because the Cloud will handle all scaling concerns.&lt;/li&gt;
+  &lt;li&gt;Re-think everything and learn all the latest buzz so your site can scale to a quintillion users.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For most people, most of the time, both of these statements are untrue. 99% of sites and web apps do not need to scale to thousands of concurrent users and rarely need the more complicated aspects of designing for large scale. At the same time, the Cloud really won’t just magically scale up in response to demand.&lt;/p&gt;
+
+&lt;p&gt;The talk is language agnostic. I do use Azure for examples, but the principles apply equally to all the cloud providers.&lt;/p&gt;
+
+&lt;h2 id=&quot;queues&quot;&gt;Queues&lt;/h2&gt;
+&lt;p&gt;Let’s say users can register for an event on your site. When a user registers, you look up their geo-location via some external service and you then save the registration in a database. It is simple and you may choose to do it all in memory. This has several problems.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If word gets around, you may get a surge of users all wanting to register at the same time.
+    &lt;ul&gt;
+      &lt;li&gt;At first, your website doesn’t scale out fast enough (see the video as to why) so your users start to see 503 errors after submission - and their data is lost.&lt;/li&gt;
+      &lt;li&gt;Once you scale out your webservers to handle the traffic, your database buckles under the load. Your website returns 500 errors to users - and you lose data until you manage to scale out the database.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;If there is a bug in your code that causes an error - you lose the data.&lt;/li&gt;
+  &lt;li&gt;If the external service you are calling goes down, you may lose the data - depending on how you handle the error - and you will certainly have a tidy up task afterwards to find and update the records with missing data.&lt;/li&gt;
+  &lt;li&gt;If the database goes down - you lose the data.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Instead of doing all this in-process, just let the webserver grab the data and write it to a queue. This is a tiny amount of work and even a very small webserver can handle a very large amount of requests like that, so it is unlikely your webserver gets overwhelmed. Now use a different function, such as an Azure Function or an AWS Lambda to process the queue messages. If anything goes wrong, the messages will automatically be retried and eventually stored in a poison queue, giving you time to fix the problem and replay the messages.&lt;br /&gt;
+Almost by magic, you have enabled your website to scale to near infinity and have massively increased its reliability.&lt;/p&gt;
+
+&lt;p&gt;But what if the queue goes down? This is a good question and one of the reasons this is a lot harder to do on-premise or when you do everything yourself. Cloud-provided queues, such as Azure’s Storage Queues, are extremely resilient and scaleable to the point where you can assume for all practical purposes that they never go down. If you really, really need it, it is pretty simple to set up a fail-over queue in another data centre.&lt;/p&gt;
+
+&lt;h2 id=&quot;database-types&quot;&gt;Database types&lt;/h2&gt;
+
+&lt;p&gt;Cloud providers offer many different ways to store your data. Not only are there managed versions of many “traditional” databases, you also get such things as Azure Blob Storage, Table Storage, BigTable and many more. These different “databases” have very different characteristics and a sensible mix of storage models can vastly increase the scalability of your solution without costing a fortune.&lt;/p&gt;
+
+&lt;h2 id=&quot;examples&quot;&gt;Examples&lt;/h2&gt;
+
+&lt;p&gt;In the video, I give some quick examples of where I have used the principles in real-world systems.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.neworbit.co.uk/azure&quot;&gt;NewOrbit&lt;/a&gt; is an Azure Gold Partner and Azure Reseller (“Direct CSP”) as well as development house. If you would like to buy your Azure from people who design and develop systems on Azure every day, give us a &lt;a href=&quot;https://neworbit.co.uk/#contact&quot;&gt;shout&lt;/a&gt; or ping me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt;. We usually give you a “trial”, in the form of a Cost, Infrastructure or Security review so you can see if we can help you and if you like working with us.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><summary type="html">15 minutes to teach two tips on how to improve scale and resilience in the cloud.</summary></entry><entry><title type="html">Migrate to the Cloud</title><link href="https://www.lytzen.name/2021/10/21/migrate-to-the-cloud.html" rel="alternate" type="text/html" title="Migrate to the Cloud" /><published>2021-10-21T00:00:00+01:00</published><updated>2021-10-21T00:00:00+01:00</updated><id>https://www.lytzen.name/2021/10/21/migrate-to-the-cloud</id><content type="html" xml:base="https://www.lytzen.name/2021/10/21/migrate-to-the-cloud.html">&lt;p&gt;I gave a talk aimed at CTO’s and technical decision-makers at a Leaders in Tech meetup in Reading in September 2019. I realised I hadn’t posted about it before, but I have shared the video many times, and it continues to hit home with technical decision-makers, whether you are already in the Cloud or still planning to move - and whichever Cloud platform you prefer.&lt;/p&gt;
 
 &lt;p&gt;The subjects I cover are relevant not only for migrating to the Cloud but also as a general guide for thinking about Cloud development and how it differs from on-prem or co-lo.&lt;/p&gt;
 
@@ -853,54 +905,4 @@ For example, I have identified some client scenarios that can benefit from autom
 
 &lt;p&gt;At &lt;a href=&quot;https://neworbit.co.uk&quot;&gt;NewOrbit&lt;/a&gt; we are actively embracing this journey. We are working on training programs for everyone from sales, through business analysts to developers so they can help our customers take advantage of this revolution in software design. We are also building some of our own products in order to test our skills and showcase what’s possible (and to have a bit of fun along the way).&lt;/p&gt;
 
-&lt;p&gt;Are you learning AI? Do you think this will affect software design as much as I do? Leave a comment with your views or contact me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt; - I’d love to hear what you think.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Technology" /><category term="AI" /><category term="Azure" /><summary type="html">AI will change how we think about, design and build software. It's a revolution on par with the move to web.</summary></entry><entry><title type="html">Azure Security Talk at rg-dev</title><link href="https://www.lytzen.name/2019/05/28/azure-security-at-rg-dev.html" rel="alternate" type="text/html" title="Azure Security Talk at rg-dev" /><published>2019-05-28T00:00:00+01:00</published><updated>2019-05-28T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/05/28/azure-security-at-rg-dev</id><content type="html" xml:base="https://www.lytzen.name/2019/05/28/azure-security-at-rg-dev.html">&lt;p&gt;I had the pleasure of doing a presentation on &lt;a href=&quot;/talks/Securing_web_apps_in_azure&quot;&gt;Securing Web Apps in Azure&lt;/a&gt; at &lt;a href=&quot;https://www.meetup.com/rg-dev/events/253406007/&quot;&gt;rg-dev #29&lt;/a&gt; in Rzeszow, Poland on 24 May 2019. 
-I was really impressed by how well organised the event was and just how dedicated and professional the audience were. We are talking about people giving up their Friday night to hear about security in Azure as well as &lt;a href=&quot;https://twitter.com/ptrstpp950&quot;&gt;Piotr Stapp&lt;/a&gt;’s talk about migrating &lt;a href=&quot;https://dotnetomaniak.pl/&quot;&gt;https://dotnetomaniak.pl/&lt;/a&gt; to Azure.&lt;br /&gt;
-Apparently this was the first ever talk done in English at rg-dev, but that didn’t feel like a barrier at all.&lt;/p&gt;
-
-&lt;p&gt;I go to Rzeszow quite frequently these days as NewOrbit has opened a small, but growing, office there (&lt;a href=&quot;https://neworbit.pl/careers/&quot;&gt;interested in joining us?&lt;/a&gt;). I look forward to attending more rg-dev meetups, though I probably need to work a bit more on my Polish :) I am consistently impressed by the developers I meet in Rzeszow and look forward to working with more of them.&lt;/p&gt;
-
-&lt;p&gt;The slides from the talk can be downloaded in &lt;a href=&quot;https://github.com/flytzen/SecurityTalk/blob/master/Secure%20Your%20Web%20App%20Presentation.pptx?raw=true&quot;&gt;PowerPoint format from GitHub&lt;/a&gt; or you can see them (without animations) on Slideshare below:&lt;/p&gt;
-
-&lt;div style=&quot;text-align:center;&quot;&gt;
-&lt;iframe src=&quot;//www.slideshare.net/slideshow/embed_code/key/vZ12nwRamiEwrr&quot; width=&quot;595&quot; height=&quot;485&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; style=&quot;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&quot; allowfullscreen=&quot;&quot;&gt; &lt;/iframe&gt;
-&lt;/div&gt;
-
-&lt;p&gt;The talk covers the things you can do to secure web apps and APIs hosted in Azure Web Apps and Functions.&lt;/p&gt;
-
-&lt;h2 id=&quot;outline&quot;&gt;Outline&lt;/h2&gt;
-&lt;div style=&quot;width: 480px; height: 360px; margin: 10px; position: relative;float:right;&quot;&gt;&lt;iframe allowfullscreen=&quot;&quot; frameborder=&quot;0&quot; style=&quot;width:480px; height:360px&quot; src=&quot;https://www.lucidchart.com/documents/embeddedchart/f4062454-7eb7-4e7a-abca-2d244417011b&quot; id=&quot;Gf4kpeh9VZr3&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
-&lt;h3 id=&quot;concepts&quot;&gt;Concepts&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;Understand your exposure; how much at risk are you and how much work should you do to secure your app?&lt;/li&gt;
-  &lt;li&gt;Understand that you are probably more at risk from internal actors making mistakes with data than you are from external hackers.&lt;/li&gt;
-  &lt;li&gt;You should think about your security at three levels;
-    &lt;ul&gt;
-      &lt;li&gt;How to &lt;em&gt;prevent&lt;/em&gt; someone from getting in&lt;/li&gt;
-      &lt;li&gt;How to &lt;em&gt;detect&lt;/em&gt; that someone is attacking you&lt;/li&gt;
-      &lt;li&gt;How to &lt;em&gt;mitigate&lt;/em&gt; the attack&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;getting-in&quot;&gt;Getting in&lt;/h3&gt;
-&lt;p&gt;Azure Web Apps and Functions are already protected by a Firewall. It is impractical, if not impossible, to add your own firewall unless you use an App Service Environment. If you must, you can add a WAF and lock down the access to your web app to only the IP address of the WAF.&lt;br /&gt;
-SSL Certificates in Azure are harder than they should be, the talk covers a few different options and their pros and cons.&lt;/p&gt;
-
-&lt;p&gt;I strongly encourage you to use Azure ADB2C (and/or Azure AD) for authentication instead of having your own usernames and passwords.&lt;/p&gt;
-
-&lt;h3 id=&quot;secret-management&quot;&gt;Secret Management&lt;/h3&gt;
-&lt;p&gt;One of the biggest problem with both security and auditing is that the application needs passwords to access certain services; Those passwords need to be stored somewhere, which usually means they are exposed to various people. This leads to auditing and security issues.&lt;/p&gt;
-
-&lt;p&gt;With Azure Key Vault and Managed Identity it is surprisingly easy to eliminate this problem; there is a lot to learn before you can do it - but the actual implementation is really easy.&lt;/p&gt;
-
-&lt;h3 id=&quot;network-isolation&quot;&gt;Network Isolation&lt;/h3&gt;
-&lt;p&gt;By default, all your back-end services such as Cosmos, SQL, storage and so on are open to other services running in Azure and some are open to the Internet. It is surprisingly easy to set up a private Virtual Network and set your back-end services so they can only be accessed from that virtual network - and then allow your web app to talk to that network. You can even set up micro-services hosted in Azure Web Apps or Functions in this way, completely blocking access from anything other than your web app.&lt;/p&gt;
-
-&lt;p&gt;The main challenge with the virtual networks is that 90% of the documentation on them has to do with features that are irrelevant when you are using Web Apps instead of VMs or Cloud Services, so it’s mainly about knowing what to ignore.&lt;/p&gt;
-
-&lt;h3 id=&quot;encryption&quot;&gt;Encryption&lt;/h3&gt;
-&lt;p&gt;Once the attacker is in - or the well-meaning employee is accessing data they probably shouldn’t - it is extremely helpful that the data is encrypted. The obvious at-rest and transport encryption is there by default, but you can use Always Encrypted and Client-side encryption to easily encrypt data at the application level.&lt;/p&gt;
-
-&lt;h3 id=&quot;detection&quot;&gt;Detection&lt;/h3&gt;
-&lt;p&gt;One of the most overlooked areas of security is detecting when someone is attacking you. If you don’t know someone is trying to hack you or that some well-meaning employee is accessing data they shouldn’t, you can’t do anything about it.
-Azure has a rich set of features to help alert you when something isn’t right. In the talk I focus on Application Insights, Threat Protection and Advanced Data Security.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><summary type="html">I did a talk on &quot;How to secure your web-app in Azure&quot; at rg-dev</summary></entry></feed>
+&lt;p&gt;Are you learning AI? Do you think this will affect software design as much as I do? Leave a comment with your views or contact me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt; - I’d love to hear what you think.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Technology" /><category term="AI" /><category term="Azure" /><summary type="html">AI will change how we think about, design and build software. It's a revolution on par with the move to web.</summary></entry></feed>

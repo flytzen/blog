@@ -1,10 +1,19 @@
+
+- title: Optimise your Azure Spend
+  date: 2022-03-15
+  link: https://www.meetup.com/dotnetoxford/events/281709324/
+
+- title: Designing for scale in the cloud 101
+  date: 2022-02-15
+  link: https://www.lytzen.name/talks/Designing_for_scale_in_the_cloud_101.html
+
 - title: AI will fundamentally change how we build software
   date: 2019-12-10
   link: https://youtu.be/4HeRqsIf-jA
 
 - title: Migrate to the Cloud
   date: 2019-09-11
-  link: https://youtu.be/0y-Xqsrr_kA
+  link: https://www.lytzen.name/2021/10/21/migrate-to-the-cloud.html
 
 - title: Securing Web Apps in Azure - rg-dev, Rzeszow, Poland
   date: 2019-05-24
