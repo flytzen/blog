@@ -7,7 +7,7 @@ tags: Azure
 modified_time: '2022-02-20'
 excerpt: 15 minutes to teach two tips on how to improve scale and resilience in the cloud.
 ---
-Having spent more than a decade designing and building systems in the Cloud there are two basic things I almost always use queues and multiple "databases". This is very simple to do, yet can massively increase both scale and resilience.
+Having spent more than a decade designing and building systems in the Cloud, there are two basic things I almost always use: queues and multiple "databases". This is very simple to do, yet can massively increase both scale and resilience.
 
 I gave a 15-minute Lightning Talk at [.Net Oxford](https://www.dotnetoxford.com/posts/2022-02-lightning-talks) in February 2022 that explains this.
 
