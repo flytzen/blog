@@ -1,4 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-02-21T10:06:22+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Designing for scale in the cloud 101</title><link href="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html" rel="alternate" type="text/html" title="Designing for scale in the cloud 101" /><published>2022-02-20T00:00:00+00:00</published><updated>2022-02-20T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud</id><content type="html" xml:base="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html">&lt;p&gt;Having spent more than a decade designing and building systems in the Cloud, there are two basic things I almost always use: queues and multiple “databases”. This is very simple to do, yet can massively increase both scale and resilience.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-03-24T11:05:11+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Spend less on Azure</title><link href="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html" rel="alternate" type="text/html" title="Spend less on Azure" /><published>2022-03-24T00:00:00+00:00</published><updated>2022-03-24T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/03/24/spend-less-on-azure</id><content type="html" xml:base="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html">&lt;p&gt;One of the things our clients often ask us to do is to review their Azure spend to see if they can save costs. It is common for us to identify potential cost savings of between 30% and 70%.&lt;/p&gt;
+
+&lt;p&gt;I gave a talk at &lt;a href=&quot;https://www.dotnetoxford.com/posts/2022-03-OptimiseYourAzureSpends&quot;&gt;.Net Oxford&lt;/a&gt; in March 2022 that goes through the methodology we use when doing &lt;a href=&quot;https://neworbit.co.uk/azure/#need-help&quot;&gt;cost reviews&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;video&quot;&gt;Video&lt;/h1&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/s0v-2lf3URs&quot; title=&quot;YouTube video player&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h1 id=&quot;talk-summary&quot;&gt;Talk Summary&lt;/h1&gt;
+
+&lt;h2 id=&quot;where-is-the-money-going&quot;&gt;Where is the money going&lt;/h2&gt;
+
+&lt;p&gt;The built-in Azure Cost Analysis tool is a really good way to understand where your actual spend is. But, it does require some getting used to.&lt;br /&gt;
+We follow a 3-step approach.&lt;/p&gt;
+
+&lt;p&gt;For each step:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Change the time period to the previous month.&lt;/li&gt;
+  &lt;li&gt;Change the Granularity to None&lt;/li&gt;
+  &lt;li&gt;Change the display to Column (Grouped)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;1-understand-the-big-picture&quot;&gt;1. Understand the big picture&lt;/h3&gt;
+
+&lt;p&gt;Change “Group By” to “Service Family” to get an idea about the split between Compute, Database and so on. Then change it to “Service Type” to get a slightly more detailed view of the split.&lt;/p&gt;
+
+&lt;p&gt;The main thing here is to understand where most of your money is spent. There is little point in trying to reduce a £50 to a £40 spend, if you have another spend that is £5,000, which you can reduce to £4,000. Focus your energy on the areas that are most expensive.&lt;/p&gt;
+
+&lt;h3 id=&quot;2-which-resource-is-it&quot;&gt;2. Which resource is it?&lt;/h3&gt;
+
+&lt;p&gt;Once you have identified which service types are most expensive, it’s time to find out which instance it is.&lt;/p&gt;
+
+&lt;p&gt;For that purpose, first add a filter for that particular service type and then Group By “Resource”. “Resource” means “Resource Name”, and will allow you to identify the specific instances that are most expensive.&lt;/p&gt;
+
+&lt;h3 id=&quot;3-what-part-of-the-service-is-it-that-is-costing&quot;&gt;3. What part of the service is it that is costing?&lt;/h3&gt;
+
+&lt;p&gt;Most services in Azure have costs that are made up of multiple sub-parts, such as bandwidth, storage, etc. It is important to understand exactly which bit it is that is expensive - you will often be surprised, so don’t make assumptions.&lt;/p&gt;
+
+&lt;p&gt;First, add a filter for the specific resource you are looking at. Then try grouping by Meter, Meter Category and Meter Subcategory. There seems to be little consistency that I can see to what hides under each of these, so try them all in turn. This often leads to surprises about what it &lt;em&gt;actually&lt;/em&gt; is that is so expensive.&lt;/p&gt;
+
+&lt;h2 id=&quot;checklist&quot;&gt;Checklist&lt;/h2&gt;
+
+&lt;p&gt;For each resource you want to reduce the cost for, this is the general checklist we go through (see the video for much more detail):&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Is the service the right size? Have you over-provisioned? Are you using too high a service tier or redundancy level?&lt;/li&gt;
+  &lt;li&gt;Is this the best service for what you are doing? Azure has many different services for each type of thing you want - and they often differ wildly in price. You can often save substantial sums by simply changing from one service type to another.&lt;/li&gt;
+  &lt;li&gt;Do you use the correct scale? Could you use scheduled, automatic or manual scaling to reduce costs?&lt;/li&gt;
+  &lt;li&gt;Could you share resources? There are many services in Azure where multiple service instances can share one set of compute and thus costs.&lt;/li&gt;
+  &lt;li&gt;Are you using Infrastructure-as-a-Service rather than Platform-as-a-Service? IaaS is &lt;em&gt;usually&lt;/em&gt; more expensive, not least because you usually need two instances to get the SLA, whereas with &lt;em&gt;most&lt;/em&gt; PaaS you only need one instance.&lt;/li&gt;
+  &lt;li&gt;Do you have services that are not actually in use? Demo or test systems that are kept running even when not used? Or services that were spun up and since abandoned?&lt;/li&gt;
+  &lt;li&gt;Could you benefit from Reserved Instances to get a discount from Azure?&lt;/li&gt;
+  &lt;li&gt;Are you in the right location? Some services are more expensive in some data centres.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;architecture&quot;&gt;Architecture&lt;/h2&gt;
+&lt;p&gt;We recommend four general principles for an architecture that reduces cost by design. The first two are the same that we recommend to achieve &lt;a href=&quot;/2022/02/20/designing-for-scale-in-the-cloud.html&quot;&gt;scale and resilience in the cloud&lt;/a&gt;, so you get two benefits for the price of one.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Use Queues. Without queues, you have to always provision enough capacity to deal with the highest potential spike in traffic. Queues give you a buffer so you can run with much lower provisioned capacity; spikes in traffic are soaked up in the queues.&lt;/li&gt;
+  &lt;li&gt;Use appropriate databases and storage options. Azure has many different ways to store data, including a wide variety of databases and things like Storage, Search and more. Moving some types of data to another storage type can sometimes reduce cost by 99% (yes, really).&lt;/li&gt;
+  &lt;li&gt;Scale &lt;em&gt;out&lt;/em&gt; rather than &lt;em&gt;up&lt;/em&gt;. Azure inherently prefers many small workloads rather than a few large workloads and will make it easier for you if you follow that paradigm. It gives you much more granularity in terms of scaling and may also give you absolute cost savings.&lt;/li&gt;
+  &lt;li&gt;Avoid Virtual Machines as far as possible. Use PaaS or containers instead.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;chattiness&quot;&gt;Chattiness&lt;/h2&gt;
+
+&lt;p&gt;One of the most common problems we find when doing cost reviews is that the system is too chatty. Usually, this means that the application makes way too many calls to the database backend, though sometimes it is the web front-end that makes too many calls to the API server. In either case, this causes excessive load on both front and backend, which means higher costs. Most developers are surprised when we show them this - you may be surprised too.&lt;/p&gt;
+
+&lt;p&gt;See our &lt;a href=&quot;/2019/05/20/find-select-nplus1-with-app-insights.html&quot;&gt;post on how to detect this&lt;/a&gt; to get a simple Application Insights query you can run to check it. You might be able to save quite a bit on your database by tidying up a bit of code or introducing a tiny bit of memory cache.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.neworbit.co.uk/azure&quot;&gt;NewOrbit&lt;/a&gt; is an Azure Gold Partner and Azure Reseller (“Direct CSP”) as well as development house. If you would like to buy your Azure from people who design and develop systems on Azure every day, give us a &lt;a href=&quot;https://neworbit.co.uk/#contact&quot;&gt;shout&lt;/a&gt; or ping me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt;. We usually give you a “trial”, in the form of a Cost, Infrastructure or Security review so you can see if we can help you and if you like working with us.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><summary type="html">It is estimated that 30% of cloud spend is wasted. How do you avoid wasting 30% of your Azure spend? This talk takes you through the approach NewOrbit takes to analyse and optimise Azure costs.</summary></entry><entry><title type="html">Designing for scale in the cloud 101</title><link href="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html" rel="alternate" type="text/html" title="Designing for scale in the cloud 101" /><published>2022-02-20T00:00:00+00:00</published><updated>2022-02-20T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud</id><content type="html" xml:base="https://www.lytzen.name/2022/02/20/designing-for-scale-in-the-cloud.html">&lt;p&gt;Having spent more than a decade designing and building systems in the Cloud, there are two basic things I almost always use: queues and multiple “databases”. This is very simple to do, yet can massively increase both scale and resilience.&lt;/p&gt;
 
 &lt;p&gt;I gave a 15-minute Lightning Talk at &lt;a href=&quot;https://www.dotnetoxford.com/posts/2022-02-lightning-talks&quot;&gt;.Net Oxford&lt;/a&gt; in February 2022 that explains this.&lt;/p&gt;
 
@@ -779,130 +853,4 @@ The recipient will create the hash in the same way you did. They will then &lt;e
 &lt;p&gt;&lt;strong&gt;It’s because a hash algorithm doesn’t actually produce a byte array at all.&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;Hash algorithms produce a very large &lt;em&gt;number&lt;/em&gt;. For example the SHA1 algorithm produces a 160-bit number; That means it takes 160 0s and 1s to write it. In base 10 it would take about 48 digits to write it out. SHA256 produces a 256 bit number, SHA512 a 512 bit number and so on.&lt;br /&gt;
-Our programming languages don’t generally have built-in types that can represent numbers that large, so the 256 bits are simply chopped into 8-bit chunks and presented to you as a byte array because there is no other easy way to do it - but you should really think about it as a single number with 256 binary digits.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="C#" /><category term="Technology" /><summary type="html">I was recently asked whether a SHA256 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry><entry><title type="html">AI will fundamentally change how we build software</title><link href="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html" rel="alternate" type="text/html" title="AI will fundamentally change how we build software" /><published>2019-08-14T00:00:00+01:00</published><updated>2019-08-14T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software</id><content type="html" xml:base="https://www.lytzen.name/2019/08/14/ai-will-fundamentally-change-software.html">&lt;p&gt;Artificial Intelligence/Machine Learning/bots are set to fundamentally change how we design and build software - even how we think about the problems we create software to solve.&lt;/p&gt;
-
-&lt;p&gt;I believe it’s a revolution on par with the move to web and I think many people working in the industry are yet to fully realise this. If you are a business analyst, architect, developer or even a business process specialist, your world is about to be turned upside down and you will have to learn a completely new skill-set or face becoming increasingly irrelevant.&lt;/p&gt;
-
-&lt;p&gt;Update: I turned this article into a 10-minute lightning talk and delivered it at .Net Oxford in December 2019:&lt;/p&gt;
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/4HeRqsIf-jA&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;You are quite likely to think I am being alarmist and you may want to dismiss what I’m saying. These could be some of the things you want to tell yourself:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;A business process is a business process. &lt;br /&gt;
-&lt;em&gt;No, it’s not. AI allows many business process to be completely re-defined or eliminated.&lt;/em&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;I still need to build - and know how to build - all the resilience, scale, micro services, databases and so on, all that AI stuff doesn’t remove the need for that.&lt;br /&gt;
-&lt;em&gt;True - but it’s no longer enough and you may find yourself being really good at solving the wrong problem.&lt;/em&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Real people don’t want to [make some change you can’t imagine should change].&lt;br /&gt;
-&lt;em&gt;Except, people do change - and more and more rapidly&lt;/em&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;I like to think of this as more of an opportunity than a threat. But, it does require you to accept you are going to be a beginner again, for a while, allow yourself to learn and to challenge everything you already know. I am on this journey myself and I don’t know the answers yet - but I am enjoying exploring.&lt;/p&gt;
-
-&lt;p&gt;Note: I am talking somewhat interchangeably about Artificial Intelligence, Machine Learning and bots. They are not the same and I am not even going to try to get the categories right, because that is not the point of this post; I am just going to talk about the impact “all of that stuff” could have on how we build software.&lt;/p&gt;
-
-&lt;h1 id=&quot;automating-routine-tasks&quot;&gt;Automating routine tasks&lt;/h1&gt;
-&lt;p&gt;The most obvious thing that springs to mind when you talk about things like Machine Learning is to automate routine tasks. The ubiquitous example is image recognition such as recognising hand writing or categorising pictures of animals into species.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://towardsdatascience.com/deep-learning-for-image-classification-why-its-challenging-where-we-ve-been-and-what-s-next-93b56948fcef&quot;&gt;&lt;img src=&quot;/assets/ClassifyPictures.png&quot; alt=&quot;Picure of photos classified into animal species&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Maybe more relevant to people likely to read this post is things like assessing the contents of online forms to decide on actions.&lt;br /&gt;
-For example, today you may have people submitting an annual health survey and have a health practitioner review these questionnaires to assess who is fine, who should receive a phone call, who should have a face-to-face visit and so on. You &lt;em&gt;can&lt;/em&gt; automate that today using hard-coded rules, but it’s probably a lot easier to analyse what the health practitioner actually decides and then train a Machine Learning model on that data.&lt;/p&gt;
-
-&lt;p&gt;In practical teams, there are a few things you can do now to start this journey;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Understand that it’s not about getting to 100% accuracy. In most cases, Machine Learning models will spit out a &lt;strong&gt;probability&lt;/strong&gt; so you can put a rule in to say that when that probability is less than, say, 90% then this thing is referred to a human being for assessment. &lt;br /&gt;
-This data can then be used to further refine the model, making it ever more accurate (you should also randomly refer some high-probability cases to a human on an ongoing basis to check and adjust the model over time).&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Think about setting your software up so you can start gathering the data; without a training set, you can’t train the model in the first place. So build the system so 100% of cases go to a human for now and design it so the &lt;em&gt;decision&lt;/em&gt; is clearly recorded along with the original input. &lt;br /&gt;
-That thing about recording the decision clearly is very often overlooked when you are just focused on the process and you are not thinking about the future potential for using Machine Learning.
-Once you have had some data through, you can start training a model - and the UI you built stays relevant for dealing with the edge cases.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;understanding-what-is-normal&quot;&gt;Understanding what is normal&lt;/h1&gt;
-&lt;p&gt;A much more subtle - and potentially pervasive - application is when a system starts to learn what’s “normal” and start to react on its own when things are “not normal”.&lt;/p&gt;
-
-&lt;p&gt;One of the best examples at the moment is &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview&quot;&gt;Azure Application Insights&lt;/a&gt;. When you add App Insights to your system, it starts recording a lot of information, including requests, dependency calls, errors etc. You can, of course, view this in the traditional way but App Insights will also use Machine Learning to automatically build up a baseline of what’s normal and alert you when something is not normal.&lt;br /&gt;
-For example, you may get an alert saying “between 10:03 and 10:07 5% of calls to [some dependency] failed - normally only 1% fail”. Or similar alerts for duration or request volume etc. The key thing here is that you do not need to set up any special rules to get these alerts, the machine learning model figures it out on its own.
-&lt;img src=&quot;/assets/AppInsightsAutoDetection.png&quot; alt=&quot;Example alert from Application Insights&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Azure also has similar things for security, threat detection and logins, where they establish a baseline for “normal” and alert you to unusual things.&lt;/p&gt;
-
-&lt;p&gt;You can use this approach in many different ways in your own software. For example, a known indicator of stress is if someone all of a sudden starts working a lot more hours. So you could use Machine Learning to automatically establish a baseline for “normal” hours &lt;em&gt;for each individual&lt;/em&gt; in your company (assuming they record timesheets) and flag it up to their manager if all of a sudden their patterns change, giving you a chance to intervene early before a wider mental health issue develops. There are standard tools out there to help you with that, including &lt;a href=&quot;https://azure.microsoft.com/en-gb/services/cognitive-services/anomaly-detector/&quot;&gt;Azure’s Anomaly Detector&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;When you are designing systems, these kind of technologies need to be in your mind. Do you rely on someone manually checking for deviations or do you have alerts or hard-coded rules to detect anomalies?&lt;/p&gt;
-
-&lt;h1 id=&quot;make-suggestions-and-correct-errors&quot;&gt;Make suggestions and correct errors&lt;/h1&gt;
-&lt;p&gt;When you receive a text message on your phone or an IM on LinkedIn, you will often be given some suggested answers; These are based on Machine Learning to analyse what the message sent to you was about and what people normally respond with in similar situations.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/LinkedInIM.jpg&quot; alt=&quot;Example of LinkedIn suggesting replies&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;You may have similar things in a UI where, for example, the system learns over time what kind and level of expenses a person normally records and alerts them if they enter something that is unusual for them. These are not system-wide rules, simply knowing that it’s normal for a particular individual to claim £50 for train tickets, but not £500. Or maybe that when you record mileage, more often than not it’s to a particular location so it can auto-suggest the description and distance.&lt;/p&gt;
-
-&lt;p&gt;The list of examples get longer the more you allow yourself to think about it, starting with detecting deviations from normal to understanding what you probably meant and suggesting that. &lt;a href=&quot;https://www.autodraw.com/&quot;&gt;Google’s Autodraw experiment&lt;/a&gt; is an amazing example of this.&lt;/p&gt;
-
-&lt;p&gt;When you are thinking about both UX and business processes - these kind of technologies need to be in your mind. Are there places where users make mistakes and we can help them not to? Are there whole new categories of problems we simply haven’t been able to solve before?
-One thing’s for sure, this is becoming the new normal so you need to incorporate it in your design thinking.&lt;/p&gt;
-
-&lt;h1 id=&quot;intent-driven-ui&quot;&gt;Intent driven UI&lt;/h1&gt;
-&lt;p&gt;I think this is probably the most challenging and different area. 
-It’s always been the case that good UX starts with &lt;em&gt;intent&lt;/em&gt;. You need to know what the user wants to achieve and then design the UX to make it easy to get there. With things like bots, we now often use natural language processing to derive intent from normal speech. I see many/most software interfaces for &lt;em&gt;occasional&lt;/em&gt; users needing to adopt this kind of conversational UI. But AI is not magic and making this work well is really hard.&lt;/p&gt;
-
-&lt;p&gt;Let me use an example to illustrate what I mean.&lt;/p&gt;
-
-&lt;p&gt;When you want to book a holiday you can probably describe it really easily to another person. Maybe “I just need to get away for a week, somewhere quiet where the kids have stuff to do. Just to get some rest and not have to think too much. It must not be too expensive, but it does need to be of a decent quality”. If you said that to an experienced travel agent, they may ask you a few follow-up questions, and would then quickly be able to suggest a few options for you. How you respond to those options (too hot, too far) would help them to better understand your needs and they would refine their suggestions. In the end, they would probably give you a list of only a handful of suggestions, even if there may be 100 trips that match your criteria because &lt;a href=&quot;https://www.amazon.com/Paradox-Choice-Barry-Schwartz/dp/0062449923/ref=cm_cr_arp_d_product_top?ie=UTF8&quot;&gt;choice is overrated&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Now imagine doing that same journey on most travel booking sites that exists today. You will be given a plethora of filters and tick-boxes so you can review every holiday option going. Except, you don’t know what half the options really mean except you know that to go somewhere quiet you need to &lt;em&gt;not&lt;/em&gt; select any of the ones that say “great night-life” or “18-30 special”. It usually ends up being an exhaustive and often frustrating journey through a bunch of options, comparing and contrasting with a lot of swearing.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/HolidayBooking.jpg&quot; alt=&quot;Example of a travel booking site&quot; /&gt;
-(&lt;em&gt;I do like Crystal’s site that I stole this picture from - I think it’s one of the better ones out there, but it illustrates the point nicely. Hope they will forgive me.&lt;/em&gt;)&lt;/p&gt;
-
-&lt;p&gt;With a more conversational UI and Machine Learning techniques, that journey could be much more like talking to an operator. Understand me right, building that system is &lt;strong&gt;hard&lt;/strong&gt;; current Artificial Intelligence is not magic and cannot “think” in any meaningful way. Underneath the covers, that nice conversation with the user still has to be translated into those same tick-boxes, so you can show them filtered results. Natural Language Processing can &lt;em&gt;help&lt;/em&gt; - but you need to identify all the intents yourself. This is not trivial but I truly believe this is where software design for occasional users is going. I believe we may see a (temporary) upsurge in slightly more hybrid solutions where artificial intelligence techniques are used but with operators being pulled in when the AI does not know what to do. However, the data gathered during those interactions will feed back into the AI model and the need for operator intervention will taper off.&lt;/p&gt;
-
-&lt;p&gt;Is the technology and the patterns there to build the dream travel booking site I describe here yet? Probably not. But it’s coming and you should start thinking about how you can start gathering the data to train those models; what can you do today to capture information about how your users express their intent?&lt;/p&gt;
-
-&lt;p&gt;In this example, what about the travel agent - should they talk to an AI as well? I don’t &lt;em&gt;think&lt;/em&gt; so. After all, we are trying to model the AI on an experienced travel agent and it would probably be counter-productive to have the travel agent interfacing with an inferior emulation of themselves. In other words, there is very much still a place for complicated user interfaces with lots of options for the users who use your system every day - but casual users are going to expect something different.&lt;/p&gt;
-
-&lt;p&gt;In practice this isn’t just for complicated things like travel agent bookings; it could be as simple as a customer wanting to buy a widget from your online store. At the same time, don’t forget that sometimes a user does want to have all the information and not just a part of it, so model that intent into your considerations as well (okay, I am drifting towards general UX design here, sorry).&lt;/p&gt;
-
-&lt;p&gt;Building conversational UIs that actually work is really hard - but it is getting easier every day and it will start to become an expectation for more and more people. Just think about how we engage with our various digital assistants. Even the humble Google Search is a lot more than just a “search”, you can ask it to translate things or do math amongst many other things.&lt;/p&gt;
-
-&lt;p&gt;When will your customers begin to expect that they can just log in to your portal and ask a question like “when will my t-shirt arrive”, rather than having to click on their account, list their orders, click on the right one and go through to “tracking”?&lt;/p&gt;
-
-&lt;h1 id=&quot;re-imagining-problems-fundamentally&quot;&gt;Re-imagining problems fundamentally&lt;/h1&gt;
-&lt;p&gt;All the above has really been about how we change existing types of software and problems to take advantage of AI to make it better or more efficient. For most of us, that is probably the primary thing we need to worry about because that &lt;strong&gt;isn’t going away anytime soon&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;But there is also another whole class of problems that we can start to solve that simply wasn’t possible before.&lt;/p&gt;
-
-&lt;p&gt;I recently spoke to &lt;a href=&quot;https://www.saladmoney.co.uk/&quot;&gt;Salad Money&lt;/a&gt;, a Social Enterprise that provide small, short-term loans. They use Open Banking and have fully automated their loan approval process, making it possible to provide these small, cheap loans cost-effectively and at scale. As they build up more data, they will be able to use Machine Learning to provide more tailored products to individuals, without having complicated or unfair assessment processes.&lt;/p&gt;
-
-&lt;p&gt;This general ability to take what used to be quite complicated things that required expert involvement, automate it and deploy it at scale is something I, personally, am quite excited about and I think we will see a lot of innovation in that space.&lt;/p&gt;
-
-&lt;h1 id=&quot;so-what-do-i-do-now&quot;&gt;So what do I do now?&lt;/h1&gt;
-&lt;p&gt;I am on the journey myself, I don’t know the answers. 
-I spent quite a long time over the last few years trying to get my head into how it all really works and I bought several books on the subject because that’s how I have always approached learning new technical topics. But most of the books very quickly descend into deep math and most seem intended to help you design Machine Learning algorithms - which is probably not what you want.&lt;/p&gt;
-
-&lt;p&gt;Eventually I had a re-think and I decided on a smarter goal for my learning, at least for now:&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;I want to be able to recognise where AI technologies can potentially help or change how I design software&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;That may sound obvious, but I don’t think I have internalised AI enough that I can (yet) instinctively recognise where I should think about AI. 
-That is obviously the first step, because once I identify these opportunities, I can then target my learning at something much more specific and/or hire help.&lt;/p&gt;
-
-&lt;p&gt;The best way I can achieve that is by seeing as many examples as I can. That means going to events, reading blog posts and watching videos. I do like to see how these things are put together, but that’s not the real purpose yet. I just want to load my brain up with examples so I can start to see the patterns of what is possible and start recognising the situations where I, too, should apply AI.&lt;/p&gt;
-
-&lt;p&gt;As a secondary goal, I also want to learn enough about the practical realities that I can at least do a proof-of-concept in order to show that there could be value.&lt;br /&gt;
-For example, I have identified some client scenarios that can benefit from automating classification as described above. I can use high-level tools, such as &lt;a href=&quot;https://marketplace.visualstudio.com/items?itemName=MLNET.07&quot;&gt;ML.Nets Model Builder&lt;/a&gt; to do a proof-of-concept without understanding the difference between a Bayes Classifier and a Logistic Regression algorithm, knowing how to do hyperparameter tuning or even clean my data that much. Would I put the result into production? Of course not. But if I can show a model that has 80% accuracy after tinkering for a couple of hours, I can create the business case for engaging a data scientist to build the real thing. And yes, I am learning how to use &lt;a href=&quot;https://jupyter.org/&quot;&gt;Jupyter Notebooks&lt;/a&gt; and all that as well, but the truth is that I don’t actually need the grown-up tools yet.&lt;/p&gt;
-
-&lt;p&gt;At &lt;a href=&quot;https://neworbit.co.uk&quot;&gt;NewOrbit&lt;/a&gt; we are actively embracing this journey. We are working on training programs for everyone from sales, through business analysts to developers so they can help our customers take advantage of this revolution in software design. We are also building some of our own products in order to test our skills and showcase what’s possible (and to have a bit of fun along the way).&lt;/p&gt;
-
-&lt;p&gt;Are you learning AI? Do you think this will affect software design as much as I do? Leave a comment with your views or contact me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt; - I’d love to hear what you think.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Technology" /><category term="AI" /><category term="Azure" /><summary type="html">AI will change how we think about, design and build software. It's a revolution on par with the move to web.</summary></entry></feed>
+Our programming languages don’t generally have built-in types that can represent numbers that large, so the 256 bits are simply chopped into 8-bit chunks and presented to you as a byte array because there is no other easy way to do it - but you should really think about it as a single number with 256 binary digits.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="C#" /><category term="Technology" /><summary type="html">I was recently asked whether a SHA256 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry></feed>
