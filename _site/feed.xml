@@ -1,4 +1,142 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-03-24T11:05:11+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Spend less on Azure</title><link href="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html" rel="alternate" type="text/html" title="Spend less on Azure" /><published>2022-03-24T00:00:00+00:00</published><updated>2022-03-24T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/03/24/spend-less-on-azure</id><content type="html" xml:base="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html">&lt;p&gt;One of the things our clients often ask us to do is to review their Azure spend to see if they can save costs. It is common for us to identify potential cost savings of between 30% and 70%.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-04-07T11:19:49+01:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Blob Storage Client-Side Encryption</title><link href="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html" rel="alternate" type="text/html" title="Blob Storage Client-Side Encryption" /><published>2022-04-06T00:00:00+01:00</published><updated>2022-04-06T00:00:00+01:00</updated><id>https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption</id><content type="html" xml:base="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html">&lt;h1 id=&quot;blob-encryption&quot;&gt;Blob encryption&lt;/h1&gt;
+
+&lt;p&gt;Azure provides disk encryption and optional infrastructure encryption, so you can easily comply with “encryption at rest” - at least from a cursory compliance level. But, anyone who has access to your Storage Account can read the blobs.
+Client-side encryption is built into the Azure Blob Storage SDK. When configured, this will transparently encrypt and decrypt the blob at the application level: You don’t need to change any of the code that reads and writes blobs at all - and your application continues to work as before. But, if you log into the Azure portal and try to download the blob, you will just see encrypted data.&lt;/p&gt;
+
+&lt;p&gt;In this post, I will explain how this works and show you how to implement it in C# with Azure Key Vault. I am using the Storage SDK 12.x - for which the encryption &lt;a href=&quot;https://docs.microsoft.com/en-us/azure/storage/blobs/storage-encrypt-decrypt-blobs-key-vault?tabs=dotnet&quot;&gt;documentation&lt;/a&gt; is still not updated at the time of the writing - and the Key Vault SDK 4.3.x.&lt;/p&gt;
+
+&lt;h1 id=&quot;how-does-this-work&quot;&gt;How does this work&lt;/h1&gt;
+
+&lt;p&gt;You &lt;em&gt;can&lt;/em&gt; implement this without Key Vault, but that is hard to do securely, so I will only focus on the Key Vault method here.&lt;/p&gt;
+
+&lt;p&gt;Firstly, all of what I am about to describe is transparently handled by the Blob Storage SDK and Key Vault, once you have wired it up.&lt;br /&gt;
+Secondly, I need to introduce a couple of concepts before I can explain how the Storage SDK works its magic.&lt;/p&gt;
+
+&lt;h2 id=&quot;symmetric-key-encryption&quot;&gt;Symmetric key encryption&lt;/h2&gt;
+
+&lt;p&gt;Symmetric key encryption means that the same key is used to encrypt and decrypt the data. It is very fast, and it scales really well to large files. Content can be encrypted and decrypted as it is being streamed, without loading everything into memory, and there is only a negligible size overhead (less than 16 bytes).&lt;br /&gt;
+AES is an example of symmetric key encryption.&lt;/p&gt;
+
+&lt;p&gt;The problem with symmetric key encryption is that you need to keep that key somewhere safe. What’s worse is that if you encrypt lots of different files with the same symmetric key, an attacker may have a chance of identifying the symmetric key used. The details of this are way beyond the scope of this article.&lt;/p&gt;
+
+&lt;p&gt;Ideally, you want a unique, randomly created symmetric key for &lt;em&gt;each&lt;/em&gt; blob you store - but then where are you going to store all those keys?&lt;/p&gt;
+
+&lt;h2 id=&quot;asymmetric-encryption&quot;&gt;Asymmetric Encryption&lt;/h2&gt;
+
+&lt;p&gt;RSA encryption is a kind of Asymmetric Encryption, is based on factors of large prime numbers and is very secure. It also has the benefit that you use the public key to encrypt the data and the private key to decrypt it. With Azure Key Vault, your code can read the Public key and use it to do encryption locally, but your code cannot read the private key and must send the encrypted content to Key Vault for decryption (I am not sure if the Blob SDK takes advantage of this or not, but you can roll it yourself for high-performance scenarios if needed).&lt;/p&gt;
+
+&lt;p&gt;The problem with RSA is that it is very slow and doesn’t scale - the C# implementation is limited to encrypting a maximum of 160 bytes. You do not want to encrypt whole files with RSA.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;There are other asymmetric encryption systems, but for the scope of this post I shall stick to RSA.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;envelope-technique&quot;&gt;Envelope technique&lt;/h2&gt;
+
+&lt;p&gt;When you save a Blob with Client-Side Encryption in Azure blob storage, the SDK will create a random, symmetric key (the Content Encryption Key or CEK) and will encrypt the content of the blob with that key.&lt;br /&gt;
+Next, the SDK will use Key Vault to encrypt the CEK, using an RSA key you have created in the Key Vault. Unless you have a specific reason to do otherwise, create an RSA 2048 key.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/createkey.png&quot; alt=&quot;Create a Key&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The SDK then stores the encrypted CEK in a Meta Tag field on the blob called &lt;code class=&quot;highlighter-rouge&quot;&gt;encryptiondata&lt;/code&gt;. It also stores some additional data, most importantly the unique identifier for the RSA key that was used to encrypt the symmetric key.&lt;/p&gt;
+
+&lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;EncryptionMode&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;FullBlob&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;WrappedContentKey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;KeyId&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https://xxx.vault.azure.net/keys/BlobEncryption/7e78c2c3164f458ba4884d3bed00925f&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;EncryptedKey&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;FgPb/2nELt5N3mzVIjD&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\u&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;002BKGVmEgpO - XXXXXXX - 7mDINXvgaVw==&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;Algorithm&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;RSA-OAEP&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;EncryptionAgent&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;Protocol&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;1.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;EncryptionAlgorithm&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;AES_CBC_256&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;ContentEncryptionIV&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;ZA3An4jhVIV8uhRJhlPJKQ==&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;KeyWrappingMetadata&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+            &lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;&quot;EncryptionLibrary&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;azsdk-net-Azure.Storage.Blobs/12.11.0&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\u&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;002B594b8851940eb859860cff9aaaafbbb092df59d6 (.NET 5.0.15; Linux 5.10.16.3-microsoft-standard-WSL2 #1 SMP Fri Apr 2 22:23:49 UTC 2021)&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When the SDK later &lt;em&gt;reads&lt;/em&gt; the blob, it also retrieves the &lt;code class=&quot;highlighter-rouge&quot;&gt;encryptiondata&lt;/code&gt; meta tag. Armed with that information, the SDK then asks Key Vault to decrypt the encrypted Content Encryption Key and then uses that symmetric key to decrypt the contents of the blob.&lt;/p&gt;
+
+&lt;p&gt;This is known as the “envelope technique”. It is a tried and tested technique that combines the best features of AES and RSA encryption.&lt;/p&gt;
+
+&lt;h2 id=&quot;key-versioning-or-rotation&quot;&gt;Key Versioning or Rotation&lt;/h2&gt;
+
+&lt;p&gt;It is common practice to “rotate” encryption keys to reduce the impact of a key being leaked. If all your blobs were encrypted with the same key and that key was leaked, all your files would be vulnerable. But if you change the key once in a while, the attacker will only get access to a limited number of blobs.&lt;/p&gt;
+
+&lt;p&gt;Each blob has its own, individual symmetric encryption key, so there is nothing to “rotate” there. If you want to change the symmetric key for a particular blob for some reason, you need to read it in code and then re-save it.&lt;/p&gt;
+
+&lt;p&gt;But what about that RSA key? If an attacker gets hold of that, they can decrypt the symmetric key for each of your blobs and then read them. Fortunately, Key Vault has a concept of “versions” of a key, and even has a new “key rotation policy” in preview, which automatically creates a new version at a set interval.
+Each “version” of a key is really a completely different key. But the mechanism means you can ask your Key Vault for the latest version of a specific key name and you will get a Key Identifier that includes a version number. That key can then be used to encrypt the data in the blob and the full Key Identifier, including the version number, is stored in the &lt;code class=&quot;highlighter-rouge&quot;&gt;encryptiondata&lt;/code&gt; meta tag.&lt;/p&gt;
+
+&lt;p&gt;When it comes time to read the blob, the Blob SDK reads the exact key version that was used to encrypt the content encryption key from the metadata. As a matter of fact, the Key Identifier includes the address of the Key Vault so if you need to use more than Key Vault for the same Blob Storage account, for example during a migration, you can.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/keyversions.png&quot; alt=&quot;Key Versions&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;implementing-this-in-c&quot;&gt;Implementing this in C#&lt;/h1&gt;
+
+&lt;p&gt;For this example I am using the following packages:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &amp;lt;PackageReference Include=&quot;Azure.Identity&quot; Version=&quot;1.5.0&quot; /&amp;gt;
+    &amp;lt;PackageReference Include=&quot;Azure.Security.KeyVault.Keys&quot; Version=&quot;4.3.0&quot; /&amp;gt;
+    &amp;lt;PackageReference Include=&quot;Azure.Storage.Blobs&quot; Version=&quot;12.11.0&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Azure Identity is only included so I can use Managed Identity to connect to Key Vault and Blob Storage. You do not need to do that; a Connection String for Blob Storage and a Service Principal for Key Vault will work just as well.&lt;/p&gt;
+
+&lt;h2 id=&quot;permissions&quot;&gt;Permissions&lt;/h2&gt;
+
+&lt;p&gt;In this example, I am using Managed Identity to access both Key Vault and Blob Storage. 
+For Key Vault, if you are using the RBAC roles, the “user” needs at least the &lt;code class=&quot;highlighter-rouge&quot;&gt;Key Vault Crypto User&lt;/code&gt; role.
+In order to create and rotate keys, you need the &lt;code class=&quot;highlighter-rouge&quot;&gt;Key Vault Crypto Officer&lt;/code&gt; role (do not give that to your application).&lt;/p&gt;
+
+&lt;p&gt;In Blob Storage SDK 12, most of what you do starts with getting a &lt;code class=&quot;highlighter-rouge&quot;&gt;BlobServiceClient&lt;/code&gt;. The method below creates a &lt;code class=&quot;highlighter-rouge&quot;&gt;BlobServiceClient&lt;/code&gt; that will transparently encrypt and decrypt data as blobs are written and read.&lt;/p&gt;
+
+&lt;p&gt;You should probably set this up to be a Singleton in your DI. The only thing to be mindful of is that if you want to use Key Rotation (and you should) then you should re-create &lt;code class=&quot;highlighter-rouge&quot;&gt;BlobServiceClient&lt;/code&gt; once in a while - on a timescale that is similar to your key rotation timescale. The reason is that the &lt;em&gt;encryption&lt;/em&gt; key is only read during the creation of the &lt;code class=&quot;highlighter-rouge&quot;&gt;BlobServiceClient&lt;/code&gt;. The old version of the key will continue to work even after a new version is created (unless you explicitly disable it in Key Vault), so you don’t have to be very precise about the timings. But, you do obviously want to start using the new key version at some point, otherwise the whole rotation thing is pointless.&lt;/p&gt;
+
+&lt;div class=&quot;language-csharp highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BlobServiceClient&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;GetBlobServiceClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyVaultUri&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;KeyVaultUri&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyIdentifier&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;BlobEncryptionKeyName&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;azureCredentials&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;DefaultAzureCredential&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// NOTE: This reads the current key version and uses that to encrypt Content Encryption Keys going forward&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Problem is that when the key gets rotated, at some point you should update the key being used&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// So, you do need to refresh this occasionally!&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyClient&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;KeyClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keyVaultUri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;azureCredentials&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;GetKey&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;keyIdentifier&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// this gets the current version of the named key&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// The cryptoClient is used to encrypt the Content Encryption Key&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cryptoClient&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;CryptographyClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;azureCredentials&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// The keyResolver is the thing that can be given a Key Identifier and get a reference to the RSA key so the CEK can be decrypted&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyResolver&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;KeyResolver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;DefaultAzureCredential&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// This and the next bit just sets up the configuration options to be used when creating the BlobServiceClient&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encryptionOptions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ClientSideEncryptionOptions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ClientSideEncryptionVersion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;V1_0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;KeyEncryptionKey&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cryptoClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;KeyResolver&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyResolver&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;KeyWrapAlgorithm&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;RSA-OAEP&quot;&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;// There are other options, use this for an RSA 2048 key&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blobClientOptions&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SpecializedBlobClientOptions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;ClientSideEncryption&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encryptionOptions&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Finally, create the BlobServiceClient with the configuration options to use encryption.&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blobServiceUrl&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configuration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetValue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;BlobServiceUri&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;BlobServiceClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Uri&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;blobServiceUrl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;azureCredentials&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;blobClientOptions&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;afterthought&quot;&gt;Afterthought&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.neworbit.co.uk/azure&quot;&gt;NewOrbit&lt;/a&gt; is an Azure Gold Partner and Azure Reseller (“Direct CSP”) as well as development house. We help other development companies to get more out of Azure, with a particular focus on reducing costs and making systems more secure.
+If you would like to buy your Azure from people who design and develop systems on Azure every day, give us a &lt;a href=&quot;https://neworbit.co.uk/#contact&quot;&gt;shout&lt;/a&gt; or ping me on &lt;a href=&quot;https://twitter.com/flytzen&quot;&gt;Twitter&lt;/a&gt;. We usually give you a “trial”, in the form of a Cost, Infrastructure or Security review so you can see if we can help you and if you like working with us.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><summary type="html">Transparently encrypt blobs in Azure Blob Storage at the Application level with client-side encryption.</summary></entry><entry><title type="html">Spend less on Azure</title><link href="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html" rel="alternate" type="text/html" title="Spend less on Azure" /><published>2022-03-24T00:00:00+00:00</published><updated>2022-03-24T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/03/24/spend-less-on-azure</id><content type="html" xml:base="https://www.lytzen.name/2022/03/24/spend-less-on-azure.html">&lt;p&gt;One of the things our clients often ask us to do is to review their Azure spend to see if they can save costs. It is common for us to identify potential cost savings of between 30% and 70%.&lt;/p&gt;
 
 &lt;p&gt;I gave a talk at &lt;a href=&quot;https://www.dotnetoxford.com/posts/2022-03-OptimiseYourAzureSpends&quot;&gt;.Net Oxford&lt;/a&gt; in March 2022 that goes through the methodology we use when doing &lt;a href=&quot;https://neworbit.co.uk/azure/#need-help&quot;&gt;cost reviews&lt;/a&gt;.&lt;/p&gt;
 
@@ -805,52 +943,4 @@ git push -u azure master
 &lt;iframe src=&quot;//www.slideshare.net/slideshow/embed_code/key/DbJSjU5lVqZNUN&quot; width=&quot;595&quot; height=&quot;485&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; style=&quot;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&quot; allowfullscreen=&quot;&quot;&gt; &lt;/iframe&gt;
 &lt;div style=&quot;margin-bottom:5px&quot;&gt; &lt;strong&gt; &lt;a href=&quot;//www.slideshare.net/FransLytzen/secure-your-azure-web-app-2019&quot; title=&quot;Secure your Azure Web App 2019&quot; target=&quot;_blank&quot;&gt;Secure your Azure Web App 2019&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&quot;https://www.slideshare.net/FransLytzen&quot; target=&quot;_blank&quot;&gt;Frans Lytzen&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;
 
-&lt;p&gt;… or download from &lt;a href=&quot;https://github.com/flytzen/SecurityTalk/blob/master/Secure%20Your%20Web%20App%20Presentation.pptx?raw=true&quot;&gt;GitHub&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="SQL" /><category term="Security" /><category term="Web" /><summary type="html">An overview of how to secure Azure Web Apps, touching on virtual networks, encryption, key vault and monitoring.</summary></entry><entry><title type="html">Can a SHA256 Hash have a “/” in it?</title><link href="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html" rel="alternate" type="text/html" title="Can a SHA256 Hash have a &quot;/&quot; in it?" /><published>2019-09-25T00:00:00+01:00</published><updated>2019-09-25T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash</id><content type="html" xml:base="https://www.lytzen.name/2019/09/25/can-a-hash-have-a-slash.html">&lt;p&gt;I was recently asked whether a SHA256 hash could have a “/” in it. If you know how hashes work, you probably know that the question doesn’t make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I’ve been doing this for a long time and some of the details were rather opaque to me until recently.&lt;/p&gt;
-
-&lt;p&gt;The short answer is that the “/” question comes about because we usually base64 encode hashes, because they are represented as byte arrays, because they are large numbers - meaning that the question really is “how do I avoid ‘/’ in base64 encoding”.&lt;/p&gt;
-
-&lt;p&gt;Let’s peel back the layers of the onion.&lt;/p&gt;
-
-&lt;h1 id=&quot;what-is-a-hash-and-why-do-i-want-one&quot;&gt;What is a hash and why do I want one?&lt;/h1&gt;
-&lt;p&gt;The idea with a &lt;em&gt;hash&lt;/em&gt; is that you can take some input (often text, but it doesn’t have to be) and then calculate a &lt;em&gt;hash&lt;/em&gt; from it.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;The hash always has the same length (the length depends on which algorithm you use).&lt;/li&gt;
-  &lt;li&gt;If you hash the same input again, you will always get the same result.&lt;/li&gt;
-  &lt;li&gt;It is impossible to deduce the input from the hash.&lt;/li&gt;
-  &lt;li&gt;Good hashes have low &lt;a href=&quot;https://blogs.msdn.microsoft.com/ericlippert/2010/03/22/socks-birthdays-and-hash-collisions/&quot;&gt;“collision” rates&lt;/a&gt;, meaning that the output hashes are widely spread across the possible values, making it unlikely that two different inputs will produce the same output (but not impossible as the hash is shorter than the input).&lt;/li&gt;
-  &lt;li&gt;A small change to the input should produce a completely different hash.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;password-hashing&quot;&gt;Password hashing&lt;/h2&gt;
-&lt;p&gt;You have probably heard about hashing passwords instead of storing them. The idea here is that when the user sets up a password, you hash it and then store the hash in the database. When the user tries to log in, you take the value they enter, hash it and check if the hash matches the stored hash. If they do, it is overwhelmingly likely that they entered the correct password. But, if an attacker steals your database, they won’t be able to deduce the passwords from the hash, which is useful because people tend to re-use passwords across sites.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Note: This is a very short explanation and ignores such things as salting, brute force, iterations and rainbow tables. Do &lt;strong&gt;not&lt;/strong&gt; implement password hashing based on what I write here, there is a lot more to it!&lt;/em&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;message-authentication-codes-mac-or-hmac&quot;&gt;Message Authentication Codes (MAC or HMAC)&lt;/h2&gt;
-&lt;p&gt;A very cool application of hashes is using it to make messages or other packages of data tamper proof.&lt;br /&gt;
-Let’s imagine you need to put a message on a queue to process an order. The message could include a product ID and a price. What if someone could intercept that message in transit and change the price?&lt;br /&gt;
-What you can do is concatenate all the information in the message and then create a &lt;em&gt;hash&lt;/em&gt; from it and include that hash in the message. The receiver can then do the same hashing and compare the resulting hash to make sure the message has not been modified in transit. This can be used in all sorts of situations, including when you round-trip data to a browser and want to make sure no-one is messing with it.
-Of course, hash algorithms are public so you need to make sure the attacker can’t just re-create the hash. There are some popular approaches, depending on your situation;&lt;/p&gt;
-
-&lt;h3 id=&quot;shared-secret&quot;&gt;Shared Secret&lt;/h3&gt;
-&lt;p&gt;If you are sending data to your own system, i.e. on a message queue or round-tripping some data to a browser etc, you would usually add a &lt;em&gt;secret&lt;/em&gt; (think password) to the concatenated data before you create the hash. An attacker won’t know the secret, so can’t re-create the hash.&lt;br /&gt;
-The recipient re-creates the hash in the same way you did, using the same secret, and compares the hashes to make sure they are the same.&lt;/p&gt;
-
-&lt;h3 id=&quot;publicprivate-key-cryptography&quot;&gt;Public/Private key cryptography&lt;/h3&gt;
-&lt;p&gt;If you are sending data between two parties, it is more common to use public/private key cryptography to &lt;em&gt;sign&lt;/em&gt; the message. In this case, you create a hash from the concatenated data and then you &lt;em&gt;encrypt&lt;/em&gt; the hash with your &lt;em&gt;private&lt;/em&gt; key and include the result with the message.&lt;br /&gt;
-The recipient will create the hash in the same way you did. They will then &lt;em&gt;decrypt&lt;/em&gt; the hash you sent using your &lt;em&gt;public&lt;/em&gt; key and check they match.&lt;/p&gt;
-
-&lt;h1 id=&quot;so-whats-with-that-string-and-the-&quot;&gt;So what’s with that string and the “/”?&lt;/h1&gt;
-&lt;p&gt;When you generate a hash in code, you will get a &lt;em&gt;byte array&lt;/em&gt; - not a string. In order to store the hash in a database and send it over HTTP etc, you will usually base64 encode it; If you aren’t familiar with it, “base64” is a mechanism for turning binary data into strings for the purpose of transmission and storage.&lt;/p&gt;
-
-&lt;p&gt;It turns out that, by default, base64 may produce “/” in it’s output and that can be problematic in some scenarios, such as when including it in URLs.&lt;/p&gt;
-
-&lt;p&gt;So, can a SHA256 Hash include a “/”? No - but the base64 representation of &lt;em&gt;any&lt;/em&gt; hash might. See &lt;a href=&quot;https://en.wikipedia.org/wiki/Base64&quot;&gt;Wikipedia&lt;/a&gt; for a deeper discussion of base64 and see the “URL Applications” section for some tips on how to modify base64 to make it safe in URLs.&lt;/p&gt;
-
-&lt;h1 id=&quot;why-is-the-hash-a-byte-array-anyway&quot;&gt;Why is the hash a byte array anyway?&lt;/h1&gt;
-&lt;p&gt;When I think about a byte array I think about video files and other binary data so I struggled to understand why the hash algorithms insist on returning byte arrays. I mean, why can’t it just give me a string?&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;It’s because a hash algorithm doesn’t actually produce a byte array at all.&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Hash algorithms produce a very large &lt;em&gt;number&lt;/em&gt;. For example the SHA1 algorithm produces a 160-bit number; That means it takes 160 0s and 1s to write it. In base 10 it would take about 48 digits to write it out. SHA256 produces a 256 bit number, SHA512 a 512 bit number and so on.&lt;br /&gt;
-Our programming languages don’t generally have built-in types that can represent numbers that large, so the 256 bits are simply chopped into 8-bit chunks and presented to you as a byte array because there is no other easy way to do it - but you should really think about it as a single number with 256 binary digits.&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="C#" /><category term="Technology" /><summary type="html">I was recently asked whether a SHA256 hash could have a &quot;/&quot; in it. If you know how hashes work, you probably know that the question doesn't make sense. But I thought it was a good reason to write a bit about how hashes work and, specifically, how they manifest in our coding. Personally, I've been doing this for a long time and some of the details were rather opaque to me until recently.</summary></entry></feed>
+&lt;p&gt;… or download from &lt;a href=&quot;https://github.com/flytzen/SecurityTalk/blob/master/Secure%20Your%20Web%20App%20Presentation.pptx?raw=true&quot;&gt;GitHub&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="SQL" /><category term="Security" /><category term="Web" /><summary type="html">An overview of how to secure Azure Web Apps, touching on virtual networks, encryption, key vault and monitoring.</summary></entry></feed>
