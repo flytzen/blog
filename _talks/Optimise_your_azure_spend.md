@@ -16,3 +16,5 @@ I will give you an overview of:
 1. How to analyse your Azure spend to figure out what is costing so much.
 2. A check-list to help you figure out if you can reduce the cost of individual services you already have.
 3. Some simple architectural patterns that can drastically reduce your spend in any cloud.
+
+I last give this talk at .Net Oxford and have a [blog post and video of the talk on my blog]({% post_url 2022-03-24-spend-less-on-azure %}).
