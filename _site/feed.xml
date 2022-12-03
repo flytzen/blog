@@ -1,4 +1,95 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-11-23T08:57:39+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Blob Storage Client-Side Encryption</title><link href="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html" rel="alternate" type="text/html" title="Blob Storage Client-Side Encryption" /><published>2022-04-06T00:00:00+01:00</published><updated>2022-04-06T00:00:00+01:00</updated><id>https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption</id><content type="html" xml:base="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html">&lt;h1 id=&quot;blob-encryption&quot;&gt;Blob encryption&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.4">Jekyll</generator><link href="https://www.lytzen.name/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.lytzen.name/" rel="alternate" type="text/html" /><updated>2022-12-03T12:12:04+00:00</updated><id>https://www.lytzen.name/</id><title type="html">Frans’ Randomness</title><subtitle>My very infrequent thoughts on the world of software development</subtitle><entry><title type="html">Azure SQL Failover Setup</title><link href="https://www.lytzen.name/2022/12/01/azure-sql-failover.html" rel="alternate" type="text/html" title="Azure SQL Failover Setup" /><published>2022-12-01T00:00:00+00:00</published><updated>2022-12-01T00:00:00+00:00</updated><id>https://www.lytzen.name/2022/12/01/azure-sql-failover</id><content type="html" xml:base="https://www.lytzen.name/2022/12/01/azure-sql-failover.html">&lt;h1 id=&quot;tldr&quot;&gt;TL;DR;&lt;/h1&gt;
+&lt;p&gt;Azure SQL Failover Groups is a managed version of Geo Replication which enables both automatic and manual failover.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Create a SQL Server in another region&lt;/li&gt;
+  &lt;li&gt;Create a Failover Group for a database currently on the primary server&lt;/li&gt;
+  &lt;li&gt;Check your authentication works on both servers&lt;/li&gt;
+  &lt;li&gt;Change your connection string to point to &lt;code class=&quot;highlighter-rouge&quot;&gt;[failover-group-name].database.windows.net&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&quot;set-up-test-server&quot;&gt;Set up test server&lt;/h1&gt;
+&lt;p&gt;If want to just try this out, use this bash script to create a server and database to experiment with.
+Note; Even if you don’t have the Azure CLI on your machine, you can run all of this from the &lt;a href=&quot;https://learn.microsoft.com/en-us/azure/cloud-shell/overview&quot;&gt;Azure Cloud Shell&lt;/a&gt; very easily.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;fl-20221201-sqlfailover
+&lt;span class=&quot;nv&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;northeurope
+&lt;span class=&quot;nv&quot;&gt;sqlServerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-eun-ss
+&lt;span class=&quot;nv&quot;&gt;sqlDbName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-db
+&lt;span class=&quot;nv&quot;&gt;sqlUsername&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=[&lt;/span&gt;sql user name of your choice]
+&lt;span class=&quot;nv&quot;&gt;sqlPassword&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=[&lt;/span&gt;strong password]
+&lt;span class=&quot;nv&quot;&gt;sqlCapacity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10 &lt;span class=&quot;c&quot;&gt;#20 = S1, 10 = S0&lt;/span&gt;
+
+az group create &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--location&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$location&lt;/span&gt;
+
+az sql server create &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--location&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$location&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--admin-user&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlUsername&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--admin-password&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlPassword&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+
+az sql db create &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlDbName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--edition&lt;/span&gt; Standard &lt;span class=&quot;nt&quot;&gt;--capacity&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlCapacity&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;auth-heads-up&quot;&gt;Auth heads-up&lt;/h1&gt;
+&lt;p&gt;Before you go any further it is important to stop for a minute and discuss authentication to avoid problems later.&lt;br /&gt;
+The failover is essentially just a bit of network routing magic: When you connect to the Failover connection string, it just routes you to the currently primary server. This means you need to take care that your applications credentials works correctly on both servers. Otherwise, everything will break when you fail over.&lt;/p&gt;
+
+&lt;h2 id=&quot;using-server-administrator-and-dbo&quot;&gt;Using server administrator and dbo&lt;/h2&gt;
+&lt;p&gt;If your application just uses the “SQL Server Administrator” login and defaults to everything in SQL (i.e. using “dbo” at the database level) then it’s relatively straight-forward: Just make sure you use the exact same SQL Admininistrator username and password on both servers.&lt;/p&gt;
+
+&lt;p&gt;* You are not really supposed to do this! Your application should have a different user, with different permissions etc. In practice, though, many applications use Azure SQL exactly like this.&lt;/p&gt;
+
+&lt;h2 id=&quot;using-managed-identity&quot;&gt;Using Managed Identity&lt;/h2&gt;
+&lt;p&gt;If you use Managed Identity (or other AD accounts) to access the database, it should “just work”. When you do &lt;code class=&quot;highlighter-rouge&quot;&gt;CREATE USER [user] FROM EXTERNAL PROVIDER&lt;/code&gt; then it is created as a “Contained User” in the database, meaning it doesn’t create a “login” on the SQL Server itself.&lt;/p&gt;
+
+&lt;p&gt;That said - do test it, preferably in a test environment.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/tutorial-windows-vm-access-sql&quot;&gt;Managed Identity with Azure SQL&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;using-your-own-sql-users&quot;&gt;Using your own SQL users&lt;/h2&gt;
+&lt;p&gt;If you have created your own SQL User for your application (and, indeed, others) and you &lt;em&gt;didn’t&lt;/em&gt; create them as “Contained Users” then you need to do some more manual work. See &lt;a href=&quot;https://learn.microsoft.com/en-us/azure/azure-sql/database/active-geo-replication-security-configure?view=azuresql&quot;&gt;this Microsoft documentation&lt;/a&gt; for more details.&lt;/p&gt;
+
+&lt;h1 id=&quot;set-up-fail-over&quot;&gt;set up fail over&lt;/h1&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;fl-20221201-sqlfailover
+&lt;span class=&quot;nv&quot;&gt;failoverlocation&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;westeurope
+&lt;span class=&quot;nv&quot;&gt;existingSqlServerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-eun-ss
+&lt;span class=&quot;nv&quot;&gt;failoverSqlServerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-euw-ss
+&lt;span class=&quot;nv&quot;&gt;failoverGroupName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-fog
+&lt;span class=&quot;nv&quot;&gt;sqlDbName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-db &lt;span class=&quot;c&quot;&gt;# name of the *existing* database&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;sqlUsername&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=[&lt;/span&gt;sql user name of your choice] &lt;span class=&quot;c&quot;&gt;# See auth section above. May need to be the same as the primary&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;sqlPassword&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=[&lt;/span&gt;strong password] &lt;span class=&quot;c&quot;&gt;# See auth section above. May need to be the same as the primary&lt;/span&gt;
+
+az sql server create &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--location&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverlocation&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--admin-user&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlUsername&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--admin-password&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlPassword&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+
+az sql failover-group create &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverGroupName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--partner-server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$existingSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--add-db&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sqlDbName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--failover-policy&lt;/span&gt; Automatic &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Remember to look at vNets and firewall rules and make sure they match!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;change-connection-string&quot;&gt;Change connection string&lt;/h1&gt;
+&lt;p&gt;Final step is to change the connection string in your application to be &lt;code class=&quot;highlighter-rouge&quot;&gt;[failover-group-name].database.windows.net&lt;/code&gt;. This will connect your application to whichever database is currently primary and will automatically redirect if the servers fail over.&lt;/p&gt;
+
+&lt;h1 id=&quot;failover&quot;&gt;Failover&lt;/h1&gt;
+
+&lt;h2 id=&quot;automatic-fail-over&quot;&gt;Automatic fail over&lt;/h2&gt;
+&lt;p&gt;By default the &lt;em&gt;automatic&lt;/em&gt; fail over will wait one hour before failing over.&lt;br /&gt;
+Azure will not automatically “fail back”: Once the primary region is working again, you need to manually “fail over” again, if you wish to do so. If your application is running hot-hot in both data centres it doesn’t matter, but otherwise you will incur a performance hit and ingress/egress costs by having your application and your database in different regions.&lt;/p&gt;
+
+&lt;h2 id=&quot;manual-failover&quot;&gt;Manual failover&lt;/h2&gt;
+&lt;p&gt;You can manually fail over in the Azure portal by going to either of the &lt;em&gt;servers&lt;/em&gt; (not database) and select “Failover groups” from the menu.&lt;br /&gt;
+Alternatively you can use the Azure CLI like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;group&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;fl-20221201-sqlfailover
+&lt;span class=&quot;nv&quot;&gt;existingSqlServerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-eun-ss
+&lt;span class=&quot;nv&quot;&gt;failoverSqlServerName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-euw-ss
+&lt;span class=&quot;nv&quot;&gt;failoverGroupName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;failovertest-uat-fog
+
+&lt;span class=&quot;c&quot;&gt;# See which server is currently primary&lt;/span&gt;
+az sql failover-group list &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$existingSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Fail over&lt;/span&gt;
+az sql failover-group set-primary &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverGroupName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Fail back&lt;/span&gt;
+az sql failover-group set-primary &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$failoverGroupName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$existingSqlServerName&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$group&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><summary type="html">Configure a replica of an Azure SQL database in another region to protect you from failures.</summary></entry><entry><title type="html">Blob Storage Client-Side Encryption</title><link href="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html" rel="alternate" type="text/html" title="Blob Storage Client-Side Encryption" /><published>2022-04-06T00:00:00+01:00</published><updated>2022-04-06T00:00:00+01:00</updated><id>https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption</id><content type="html" xml:base="https://www.lytzen.name/2022/04/06/blob-storage-client-side-encryption.html">&lt;h1 id=&quot;blob-encryption&quot;&gt;Blob encryption&lt;/h1&gt;
 
 &lt;p&gt;Azure provides disk encryption and optional infrastructure encryption, so you can easily comply with “encryption at rest” - at least from a cursory compliance level. But, anyone who has access to your Storage Account can read the blobs.
 Client-side encryption is built into the Azure Blob Storage SDK. When configured, this will transparently encrypt and decrypt the blob at the application level: You don’t need to change any of the code that reads and writes blobs at all - and your application continues to work as before. But, if you log into the Azure portal and try to download the blob, you will just see encrypted data.&lt;/p&gt;
@@ -824,123 +915,4 @@ git push -u azure master
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;az webapp browse --name fl-test-keyvault-secrets
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://azureadventcalendar.com/&quot;&gt;&lt;img src=&quot;/assets/Advent-Calendar7.jpg&quot; alt=&quot;Azure Advent Calendar logo&quot; /&gt;&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="Security" /><summary type="html">Use Azure Key Vault to safely store secrets and passwords in Azure</summary></entry><entry><title type="html">Secure your Web App in Azure at DDD14</title><link href="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html" rel="alternate" type="text/html" title="Secure your Web App in Azure at DDD14" /><published>2019-10-16T00:00:00+01:00</published><updated>2019-10-16T00:00:00+01:00</updated><id>https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14</id><content type="html" xml:base="https://www.lytzen.name/2019/10/16/secure-your-webapp-in-azure-at-ddd14.html">&lt;p&gt;I had the great pleasure of giving an updated version of my &lt;a href=&quot;/talks/Securing_web_apps_in_azure.html&quot;&gt;“Secure your Web App in Azure” talk&lt;/a&gt; talk at &lt;a href=&quot;https://developerdeveloperdeveloper.com/&quot;&gt;Developer Developer Developer 14&lt;/a&gt; in Reading on 12 October 2019.&lt;/p&gt;
-
-&lt;p&gt;A video of the whole talk is available below.&lt;/p&gt;
-
-&lt;p&gt;I touch on a whole range of Azure technologies, but mostly I introduce and expand on a simple framework to think about and manage your exposure.&lt;/p&gt;
-
-&lt;h2 id=&quot;example-of-exposure-and-mitigation&quot;&gt;Example of exposure and mitigation&lt;/h2&gt;
-&lt;table&gt;
-&lt;tr&gt;
-    &lt;th&gt;&lt;/th&gt;
-    &lt;th&gt;External Actors&lt;/th&gt;
-    &lt;th&gt;Internal Actors&lt;/th&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-    &lt;th&gt;PREVENT&lt;/th&gt;
-    &lt;td&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-                Secure your code – see Troy Hunt’s courses as a starting point.
-            &lt;/li&gt;
-            &lt;li&gt;
-                Lock down your servers
-            &lt;/li&gt;
-            &lt;li&gt;
-                Use Firewalls and Intrusion Detection/Prevention Systems
-            &lt;/li&gt;
-            &lt;li&gt;
-                Encrypt everything in transit
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/td&gt;
-    &lt;td&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-                Protect your passwords/secrets
-            &lt;/li&gt;
-            &lt;li&gt;
-                Process for granting and removing access
-            &lt;/li&gt;
-            &lt;li&gt;
-                Use Azure AD for all access, including SQL
-            &lt;/li&gt;
-            &lt;li&gt;
-                Audit who has access on a regular basis and remove unnecessary access
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-    &lt;th&gt;DETECT&lt;/th&gt;
-    &lt;td&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-                Log and alert on any unusual application activity
-                &lt;ul&gt;
-                    &lt;li&gt;
-                        403s and 404s
-                    &lt;/li&gt;
-                    &lt;li&gt;
-                        Failed logins
-                    &lt;/li&gt;
-                    &lt;li&gt;
-                        High CPU/memory, increased load
-                    &lt;/li&gt;
-                    &lt;li&gt;
-                        Etc
-                    &lt;/li&gt;
-                &lt;/ul&gt;
-            &lt;/li&gt;
-            &lt;li&gt;
-                Use Advanced Threat Protection
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/td&gt;
-    &lt;td&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-                Log and alert on all access to the backend by internal users
-            &lt;/li&gt;
-            &lt;li&gt;
-                Log and alert on unusual access patterns by application users
-            &lt;/li&gt;
-            &lt;li&gt;
-                Consider DLP tools
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/td&gt;
-&lt;/tr&gt;
-
-&lt;tr&gt;
-    &lt;th&gt;MITIGATE&lt;/th&gt;
-    &lt;td colspan=&quot;2&quot;&gt;
-        &lt;ul&gt;
-            &lt;li&gt;
-                Encrypt sensitive data at the application layer
-            &lt;/li&gt;
-            &lt;li&gt;
-                Have ways of locking out certain users or IP addresses
-            &lt;/li&gt;
-            &lt;li&gt;
-                For very sensitive systems, consider multi-layered architectures to contain breaches
-            &lt;/li&gt;
-        &lt;/ul&gt;
-    &lt;/td&gt;
-    
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;video-of-the-whole-talk&quot;&gt;Video of the whole talk&lt;/h2&gt;
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/HZgjlTi7OiA&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;h2 id=&quot;slides&quot;&gt;Slides&lt;/h2&gt;
-&lt;p&gt;View the slides on Slide Share:&lt;/p&gt;
-&lt;iframe src=&quot;//www.slideshare.net/slideshow/embed_code/key/DbJSjU5lVqZNUN&quot; width=&quot;595&quot; height=&quot;485&quot; frameborder=&quot;0&quot; marginwidth=&quot;0&quot; marginheight=&quot;0&quot; scrolling=&quot;no&quot; style=&quot;border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;&quot; allowfullscreen=&quot;&quot;&gt; &lt;/iframe&gt;
-&lt;div style=&quot;margin-bottom:5px&quot;&gt; &lt;strong&gt; &lt;a href=&quot;//www.slideshare.net/FransLytzen/secure-your-azure-web-app-2019&quot; title=&quot;Secure your Azure Web App 2019&quot; target=&quot;_blank&quot;&gt;Secure your Azure Web App 2019&lt;/a&gt; &lt;/strong&gt; from &lt;strong&gt;&lt;a href=&quot;https://www.slideshare.net/FransLytzen&quot; target=&quot;_blank&quot;&gt;Frans Lytzen&lt;/a&gt;&lt;/strong&gt; &lt;/div&gt;
-
-&lt;p&gt;… or download from &lt;a href=&quot;https://github.com/flytzen/SecurityTalk/blob/master/Secure%20Your%20Web%20App%20Presentation.pptx?raw=true&quot;&gt;GitHub&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="SQL" /><category term="Security" /><category term="Web" /><summary type="html">An overview of how to secure Azure Web Apps, touching on virtual networks, encryption, key vault and monitoring.</summary></entry></feed>
+&lt;p&gt;&lt;a href=&quot;https://azureadventcalendar.com/&quot;&gt;&lt;img src=&quot;/assets/Advent-Calendar7.jpg&quot; alt=&quot;Azure Advent Calendar logo&quot; /&gt;&lt;/a&gt;&lt;/p&gt;</content><author><name>Frans Lytzen</name></author><category term="Azure" /><category term="Security" /><summary type="html">Use Azure Key Vault to safely store secrets and passwords in Azure</summary></entry></feed>
