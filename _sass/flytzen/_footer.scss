@@ -27,7 +27,7 @@ body {
     border-radius: 50%;
     border: 2px solid white;
     line-height: 6rem;
-    margin: 0 $spacing / 2;
+    margin: 0 $spacing * 0.5;
 
     &:hover {
       background: white;

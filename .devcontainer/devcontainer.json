@@ -9,18 +9,21 @@
 			"NODE_VERSION": "lts/*"
 		}	
 	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"davidanson.vscode-markdownlint", // Jekyll is mostly markdown, so let's do it well :)
+				"dbaeumer.vscode-eslint", 
+				"streetsidesoftware.code-spell-checker",
+				"sissel.shopify-liquid",
+				"bierner.github-markdown-preview",
+				"ms-vscode.wordcount",
+				"bierner.markdown-yaml-preamble",
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	},
 
-	// Set *default* container specific settings.json values on container create.
-	"settings": {},
-
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"davidanson.vscode-markdownlint" // Jekyll is mostly markdown, so let's do it well :)
-		, "dbaeumer.vscode-eslint"
-		, "ms-edgedevtools.vscode-edge-devtools"
-		, "sissel.shopify-liquid"
-		, "znck.grammarly"
-	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
